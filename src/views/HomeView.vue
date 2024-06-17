@@ -1,16 +1,17 @@
 <template>
-  <main>
-    <IndexSidebar />
-  </main>
+    <main>
+        <!-- <IndexSidebar /> -->
+        <router-link to="/indexsidebar">登入</router-link>
+    </main>
 </template>
 
 <script>
-import IndexSidebar from '@/components/IndexSidebar.vue'
+// import IndexSidebar from '@/components/IndexSidebar.vue'
 
 export default {
-  components: {
-    IndexSidebar
-  }
+    components: {
+        // IndexSidebar
+    }
 }
 </script>
 

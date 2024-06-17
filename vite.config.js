@@ -10,7 +10,7 @@ export default defineConfig({
     css: {
         preprocessorOptions: {
             scss: {
-                additionalData: `@import "@/assets/all.scss";`
+                additionalData: `@import "@/assets/scss/style.scss";` //可以吃到bootsrap變數，但載入變慢
             }
         }
     },

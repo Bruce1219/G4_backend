@@ -6,7 +6,7 @@
 
 <style lang="scss" scoped>
 * {
-    background-color: $teal;
+    background-color: orange;
     /* 測試路由 */
 }
 </style>

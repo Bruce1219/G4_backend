@@ -40,6 +40,9 @@
                 <button class="btn-logout">登出</button>
             </div>
         </div>
+        <div class="router-page">
+            <router-view></router-view>
+        </div>
     </section>
 </template>
 
@@ -54,9 +57,9 @@ export default {
                     target: '#home-collapse',
                     collapseId: 'home-collapse',
                     links: [
-                        { route: '/farm', text: '農場' },
-                        { route: '/news', text: '最新消息' },
-                        { route: '/chatbox', text: '客服機器人' }
+                        { route: '/indexsidebar/farm', text: '農場' },
+                        { route: '/indexsidebar/news', text: '最新消息' },
+                        { route: '/indexsidebar/chatbox', text: '客服機器人' }
                     ]
                 },
                 {
@@ -64,7 +67,7 @@ export default {
                     target: '#member-collapse',
                     collapseId: 'member-collapse',
                     links: [
-                        { route: '/member', text: '會員' }
+                        { route: '/indexsidebar/member', text: '會員' }
                         // { route: '/coupons', text: '會員擁有優惠卷' },
                         // { route: '/favorites', text: '會員收藏商品' }
                     ]
@@ -74,9 +77,9 @@ export default {
                     target: '#product-collapse',
                     collapseId: 'product-collapse',
                     links: [
-                        { route: '/product', text: '商品' },
+                        { route: '/indexsidebar/product', text: '商品' },
                         // { route: '/categories', text: '商品分類' },
-                        { route: '/porders', text: '商品訂單' }
+                        { route: '/indexsidebar/porders', text: '商品訂單' }
                         // { route: '/details', text: '商品明細' }
                     ]
                 },
@@ -85,24 +88,24 @@ export default {
                     target: '#activity-collapse',
                     collapseId: 'activity-collapse',
                     links: [
-                        { route: '/activity', text: '活動' },
+                        { route: '/indexsidebar/activity', text: '活動' },
                         // { route: '/activity-categories', text: '活動分類' },
-                        { route: '/aorders', text: '活動訂單' }
+                        { route: '/indexsidebar/aorders', text: '活動訂單' }
                     ]
                 },
                 {
                     title: '遊戲管理',
                     target: '#game-collapse',
                     collapseId: 'game-collapse',
-                    links: [{ route: '/game', text: '食農問答' }]
+                    links: [{ route: '/indexsidebar/game', text: '食農問答' }]
                 },
                 {
                     title: '後台管理',
                     target: '#back-collapse',
                     collapseId: 'back-collapse',
                     links: [
-                        { route: '/admin', text: '管理員' },
-                        { route: '/coupon', text: '優惠卷' }
+                        { route: '/indexsidebar/admin', text: '管理員' },
+                        { route: '/indexsidebar/coupon', text: '優惠卷' }
                     ]
                 }
             ]
