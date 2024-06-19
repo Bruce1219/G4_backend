@@ -204,7 +204,7 @@ export default {
                 background-color: $red;
                 border: none;
                 padding: 7px 15px;
-                margin: 5px 0;
+                margin: 5px 10px;
                 border-radius: 20px;
                 transition: 0.5s;
                 &:hover {
@@ -218,7 +218,7 @@ export default {
                 background-color: $darkGreen;
                 border: none;
                 padding: 7px 15px;
-                margin: 5px 0;
+                margin: 5px 10px;
                 border-radius: 20px;
                 transition: 0.5s;
                 &:hover {

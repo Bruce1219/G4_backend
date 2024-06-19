@@ -15,6 +15,7 @@
                         <th scope="col">農場名稱</th>
                         <th scope="col">金額</th>
                         <th scope="col">熱門商品</th>
+                        <th scope="col">狀態</th>
                         <th scope="col">操作</th>
                     </tr>
                 </thead>
@@ -31,6 +32,12 @@
                         <td>{{ item.f_no }}</td>
                         <td>NT$ {{ item.p_fee }}</td>
                         <td><input type="checkbox" /><span>請勾選</span></td>
+                        <td>
+                            <select name="" id="">
+                                <option value="">上架</option>
+                                <option value="">下架</option>
+                            </select>
+                        </td>
                         <td>
                             <button class="edit">編輯</button>
                         </td>
@@ -196,6 +203,7 @@ export default {
                 display: flex;
                 align-items: center; /* 垂直居中對齊 */
                 justify-content: center; /* 水平居中對齊 */
+                padding: 5px;
                 img {
                     width: 100px;
                     height: 80px;

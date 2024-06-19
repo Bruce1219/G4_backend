@@ -184,6 +184,8 @@ export default {
                 display: flex;
                 align-items: center; /* 垂直居中對齊 */
                 justify-content: center; /* 水平居中對齊 */
+                padding: 5px;
+
                 img {
                     width: 100px;
                     height: 80px;
