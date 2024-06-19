@@ -8,9 +8,9 @@ export default defineConfig(({ command, mode, isSsrBuild, isPreview }) => {
     if (mode === 'prod') {
         // 放準備部署到server的設定
         return {
-            base: '/cid101/g4/front/',
+            base: '/cid101/g4/admin/',
             build: {
-                outDir: 'front'
+                outDir: 'admin'
             },
             plugins: [vue(), VueDevTools()],
             css: {
