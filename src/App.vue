@@ -17,8 +17,4 @@ export default {
 }
 </script>
 
-<style lang="scss">
-* {
-    // background-color: $bcgw;
-}
-</style>
+<style lang="scss"></style>
