@@ -18,5 +18,7 @@ export default {
 </script>
 
 <style lang="scss">
-// @import './assets/all.scss';
+* {
+    // background-color: $bcgw;
+}
 </style>

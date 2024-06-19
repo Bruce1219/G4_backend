@@ -1,12 +1,217 @@
 <template>
-    <div>管理員</div>
+    <section class="section">
+        <div class="container">
+            <div>
+                <h1>管理員管理</h1>
+                <button>+ 新增管理員</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th scope="col">管理員代號</th>
+                        <th scope="col">等級</th>
+                        <th scope="col">帳號</th>
+                        <th scope="col">密碼</th>
+                        <th scope="col">狀態</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="user in admin" :key="user.id">
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.level }}</td>
+                        <td>{{ user.account }}</td>
+                        <td>{{ user.password }}</td>
+                        <td>
+                            <button
+                                class="normal"
+                                v-if="user.status === '正常'"
+                                @click="toggleStatus(user)"
+                            >
+                                正常
+                            </button>
+                            <button
+                                class="useless"
+                                v-if="user.status === '停用'"
+                                @click="toggleStatus(user)"
+                            >
+                                停用
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
 </template>
 
-<script></script>
+<script>
+export default {
+    data() {
+        return {
+            admin: [
+                {
+                    id: '001',
+                    level: 1,
+                    account: 'xiaoming.zhang@example.com',
+                    password: '111111',
+                    status: '正常'
+                },
+                {
+                    id: '002',
+                    level: 2,
+                    account: 'meili.li@example.com',
+                    password: '00000',
+                    status: '正常'
+                },
+                {
+                    id: '003',
+                    level: 3,
+                    account: 'dahua.wang@example.com',
+                    password: '22222',
+                    status: '停用'
+                },
+                {
+                    id: '004',
+                    level: 3,
+                    account: 'shufen.chen@example.com',
+                    password: '33333',
+                    status: '正常'
+                },
+                {
+                    id: '005',
+                    level: 3,
+                    account: 'zhiqiang.lin@example.com',
+                    password: '4444',
+                    status: '停用'
+                }
+            ]
+        }
+    },
+    methods: {
+        toggleStatus(user) {
+            user.status = user.status === '正常' ? '停用' : '正常'
+        }
+    }
+}
+</script>
 
 <style lang="scss" scoped>
-* {
-    background-color: orange;
-    /* 測試路由 */
+.section {
+    font-size: $fontBase;
+    line-height: $lineheight;
+    letter-spacing: $letterSpacing;
+    font-family: $pFont;
+    cursor: default;
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-start;
+    .container {
+        width: 80%;
+        padding: 20px;
+        margin: 0;
+        div {
+            display: flex;
+            justify-content: space-between;
+            h1 {
+                font-size: 2.25em;
+                font-family: $titleFont;
+                font-weight: bold;
+            }
+            button {
+                color: #fff;
+                text-decoration: none;
+                background-color: $darkGreen;
+                border: none;
+                padding: 7px 15px;
+                margin: 5px 0;
+                border-radius: 10px;
+                transition: 0.5s;
+                &:hover {
+                    background-color: $red;
+                }
+            }
+        }
+
+        table {
+            width: 100%;
+            margin-top: 30px;
+            // border: solid 1px $darkGreen;
+            background-color: #fff;
+            border-collapse: separate;
+            border-spacing: 0;
+            thead {
+                line-height: 3;
+                text-align: center;
+                font-weight: bold;
+                border-collapse: separate;
+                border-radius: 20px;
+            }
+            tr {
+                border-collapse: separate;
+                border-radius: 20px;
+            }
+            th {
+                color: #144433;
+                font-size: 16px;
+                padding: 10px;
+                border: solid 1px $darkGreen;
+            }
+            td {
+                font-size: 16px;
+                margin: 0 3px;
+                line-height: 3;
+                text-align: center;
+                border: solid 1px $darkGreen;
+            }
+            /*第一欄第一列：左上*/
+            tr:first-child th:first-child {
+                border-top-left-radius: 20px;
+            }
+            /*第一欄最後列：左下*/
+            tr:last-child td:first-child {
+                border-bottom-left-radius: 20px;
+            }
+            /*最後欄第一列：右上*/
+            tr:first-child th:last-child {
+                border-top-right-radius: 20px;
+            }
+            /*最後欄第一列：右下*/
+            tr:last-child td:last-child {
+                border-bottom-right-radius: 20px;
+            }
+            td:last-child {
+                line-height: 1;
+            }
+            .normal {
+                // width: 20px;
+                color: #fff;
+                text-decoration: none;
+                background-color: $darkGreen;
+                border: none;
+                padding: 7px 15px;
+                margin: 5px 0;
+                border-radius: 20px;
+                transition: 0.5s;
+                &:hover {
+                    background-color: $red;
+                }
+            }
+            .useless {
+                // width: 20px;
+                color: #fff;
+                text-decoration: none;
+                background-color: $red;
+                border: none;
+                padding: 7px 15px;
+                margin: 5px 0;
+                border-radius: 20px;
+                transition: 0.5s;
+                &:hover {
+                    background-color: $darkGreen;
+                }
+            }
+        }
+    }
 }
 </style>

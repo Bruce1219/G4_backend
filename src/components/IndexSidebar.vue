@@ -1,5 +1,9 @@
 <template>
     <section>
+        <div class="maintitle">
+            <h1>果籽後台</h1>
+            <span>管理員 : {{ am_no }}</span>
+        </div>
         <div class="sidebar-nav d-flex flex-column align-items-center">
             <div class="title">
                 <router-link to="/indexsidebar/admin">
@@ -45,9 +49,7 @@
                 </li>
             </ul>
             <div class="logout d-flex flex-column align-items-center">
-                <button class="btn-logout">
-                    <router-link to="/">登出</router-link>
-                </button>
+                <router-link class="btn-logout" to="/">登出</router-link>
             </div>
         </div>
         <div class="router-page">
@@ -60,6 +62,7 @@
 export default {
     data() {
         return {
+            am_no: '001',
             activeIndex: null,
             activeLinkIndex: null,
             navItems: [
@@ -150,10 +153,28 @@ section {
     line-height: $lineheight;
     letter-spacing: $letterSpacing;
     font-family: $pFont;
+    cursor: default;
     width: 100%;
+    .maintitle {
+        background-color: $darkGreen;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        h1 {
+            color: #fff;
+            font-family: $titleFont;
+            font-weight: bold;
+            font-size: 2.5em;
+        }
+        span {
+            color: #fff;
+        }
+    }
     .sidebar-nav {
         width: 20%;
         background-color: $darkGreen;
+        box-shadow: 0 0 6px hsla(0, 0%, 0%, 0.4);
         // padding-left: 50px;
         padding-top: 10px;
         height: 100vh;
@@ -234,6 +255,8 @@ section {
             padding-top: 20px;
             border-top: solid 1px #d9d9d9;
             .btn-logout {
+                color: #fff;
+                text-decoration: none;
                 background-color: #e76900;
                 border: none;
                 padding: 6px 30px;
@@ -248,6 +271,9 @@ section {
                 }
             }
         }
+    }
+    .router-page {
+        width: 100%;
     }
 }
 </style>
