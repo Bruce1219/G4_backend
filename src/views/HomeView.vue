@@ -90,6 +90,7 @@ section {
             .title {
                 text-align: center;
                 h1 {
+                    font-family: $titleFont;
                     font-size: 2.25em;
                     cursor: default;
                 }

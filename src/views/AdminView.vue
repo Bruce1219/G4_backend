@@ -108,7 +108,7 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
-        padding: 20px;
+        padding: 30px;
         margin: 0;
         div {
             display: flex;
@@ -122,13 +122,16 @@ export default {
                 color: #fff;
                 text-decoration: none;
                 background-color: $darkGreen;
-                border: none;
+                border: solid 1px transparent;
                 padding: 7px 15px;
                 margin: 5px 0;
                 border-radius: 10px;
                 transition: 0.5s;
+                box-sizing: border-box;
                 &:hover {
-                    background-color: $red;
+                    background-color: #fff;
+                    border: solid 1px $darkGreen;
+                    color: $darkGreen;
                 }
             }
         }
