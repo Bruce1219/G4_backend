@@ -2,7 +2,7 @@
     <section class="section">
         <div class="container">
             <div>
-                <h1>訂單管理</h1>
+                <h1>商品訂單管理</h1>
             </div>
             <table>
                 <thead>
@@ -17,8 +17,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="user in p_orders" :key="user.p0_no">
-                        <td>{{ user.p0_no }}</td>
+                    <tr v-for="user in p_orders" :key="user.po_no">
+                        <td>{{ user.po_no }}</td>
                         <td>{{ user.m_no }}</td>
                         <td>{{ user.po_name }}</td>
                         <td>{{ user.po_time }}</td>
@@ -33,7 +33,7 @@
                             </select>
                         </td>
                         <td>
-                            <button class="edit">編輯</button>
+                            <button class="edit">查看</button>
                         </td>
                     </tr>
                 </tbody>
@@ -48,7 +48,7 @@ export default {
         return {
             p_orders: [
                 {
-                    p0_no: 'A001',
+                    po_no: 'A001',
                     m_no: '001',
                     po_name: '張員瑛',
                     po_time: '2024/06/11',
@@ -56,7 +56,7 @@ export default {
                     status: '正常'
                 },
                 {
-                    p0_no: 'A002',
+                    po_no: 'A002',
                     m_no: '002',
                     po_name: '金采源',
                     po_time: '2024/06/09',
@@ -65,7 +65,7 @@ export default {
                     status: '正常'
                 },
                 {
-                    p0_no: 'A003',
+                    po_no: 'A003',
                     m_no: '003',
                     po_name: '安兪真',
                     po_time: '2024/06/03',
@@ -74,7 +74,7 @@ export default {
                     status: '停用'
                 },
                 {
-                    p0_no: 'A004',
+                    po_no: 'A004',
                     m_no: '004',
                     po_name: 'Sakura',
                     po_time: '2024/06/02',
@@ -83,7 +83,7 @@ export default {
                     status: '正常'
                 },
                 {
-                    p0_no: 'A005',
+                    po_no: 'A005',
                     m_no: '005',
                     po_name: 'Karina',
                     po_time: '2024/06/01',
@@ -94,11 +94,7 @@ export default {
             ]
         }
     },
-    methods: {
-        toggleStatus(user) {
-            user.status = user.status === '正常' ? '停用' : '正常'
-        }
-    }
+    methods: {}
 }
 </script>
 

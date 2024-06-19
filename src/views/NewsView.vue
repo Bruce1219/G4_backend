@@ -12,6 +12,7 @@
                         <th scope="col">消息圖片</th>
                         <th scope="col">標題</th>
                         <th scope="col">連結</th>
+                        <th scope="col">狀態</th>
                         <th scope="col">操作</th>
                     </tr>
                 </thead>
@@ -25,6 +26,12 @@
                         </td>
                         <td>{{ item.n_article }}</td>
                         <td>{{ item.n_link }}</td>
+                        <td>
+                            <select name="" id="">
+                                <option value="">上架</option>
+                                <option value="">下架</option>
+                            </select>
+                        </td>
                         <td>
                             <button class="edit">編輯</button>
                         </td>

@@ -12,7 +12,7 @@
                         <th scope="col">帳號</th>
                         <th scope="col">電話</th>
                         <th scope="col">地址</th>
-                        <th scope="col">操作</th>
+                        <th scope="col">狀態</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -25,17 +25,17 @@
                         <td>
                             <button
                                 class="normal"
+                                v-if="user.m_status === '正常'"
+                                @click="toggleStatus(user)"
+                            >
+                                正常
+                            </button>
+                            <button
+                                class="useless"
                                 v-if="user.m_status === '停權'"
                                 @click="toggleStatus(user)"
                             >
                                 停權
-                            </button>
-                            <button
-                                class="useless"
-                                v-if="user.m_status === '復權'"
-                                @click="toggleStatus(user)"
-                            >
-                                復權
                             </button>
                         </td>
                     </tr>
@@ -57,7 +57,7 @@ export default {
                     m_account: 'xiaoming.zhang@example.com',
                     m_phone: '0912345678',
                     m_address: '台北市中正區信義路一段123號',
-                    m_status: '停權'
+                    m_status: '正常'
                 },
                 {
                     m_no: '002',
@@ -66,7 +66,7 @@ export default {
                     m_account: 'meili.li@example.com',
                     m_phone: '0912345678',
                     m_address: '台北市中正區信義路一段123號',
-                    m_status: '停權'
+                    m_status: '正常'
                 },
                 {
                     m_no: '003',
@@ -75,7 +75,7 @@ export default {
                     m_account: 'dahua.wang@example.com',
                     m_phone: '0912345678',
                     m_address: '台北市中正區信義路一段123號',
-                    m_status: '停權'
+                    m_status: '正常'
                 },
                 {
                     m_no: '004',
@@ -84,7 +84,7 @@ export default {
                     m_account: 'shufen.chen@example.com',
                     m_phone: '0912345678',
                     m_address: '台北市中正區信義路一段123號',
-                    m_status: '停權'
+                    m_status: '正常'
                 },
                 {
                     m_no: '005',
@@ -100,7 +100,7 @@ export default {
     },
     methods: {
         toggleStatus(user) {
-            user.m_status = user.m_status === '停權' ? '復權' : '停權'
+            user.m_status = user.m_status === '正常' ? '停權' : '正常'
         }
     }
 }
@@ -201,20 +201,6 @@ export default {
                 // width: 20px;
                 color: #fff;
                 text-decoration: none;
-                background-color: $red;
-                border: none;
-                padding: 7px 15px;
-                margin: 5px 10px;
-                border-radius: 20px;
-                transition: 0.5s;
-                &:hover {
-                    background-color: $darkGreen;
-                }
-            }
-            .useless {
-                // width: 20px;
-                color: #fff;
-                text-decoration: none;
                 background-color: $darkGreen;
                 border: none;
                 padding: 7px 15px;
@@ -223,6 +209,20 @@ export default {
                 transition: 0.5s;
                 &:hover {
                     background-color: $red;
+                }
+            }
+            .useless {
+                // width: 20px;
+                color: #fff;
+                text-decoration: none;
+                background-color: $red;
+                border: none;
+                padding: 7px 15px;
+                margin: 5px 10px;
+                border-radius: 20px;
+                transition: 0.5s;
+                &:hover {
+                    background-color: $darkGreen;
                 }
             }
         }
