@@ -1,11 +1,12 @@
 <template>
     <section>
-        <!-- <div class="title">
-            <h1>果籽後台</h1>
-        </div> -->
         <div class="sidebar-nav d-flex flex-column align-items-center">
             <div class="title">
-                <router-link to="/">果籽後台</router-link>
+                <router-link to="/indexsidebar/admin">
+                    <div class="pic-logo">
+                        <img src="../assets/image/logo.png" alt="" />
+                    </div>
+                </router-link>
             </div>
             <ul class="list-unstyled ps-0">
                 <li
@@ -13,13 +14,13 @@
                     v-for="(item, index) in navItems"
                     :key="index"
                 >
+                    <!-- data-bs-toggle="collapse"
+                :data-bs-target="item.target" -->
                     <button
                         class="collapsed"
                         :class="{ 'active-button': activeIndex === index }"
-                        data-bs-toggle="collapse"
-                        :data-bs-target="item.target"
-                        aria-expanded="false"
-                        @click="toggle(index)"
+                        :aria-expanded="activeIndex === index"
+                        @click.stop="toggle(index)"
                     >
                         {{ item.title }}
                     </button>
@@ -30,14 +31,23 @@
                     >
                         <ul class="d-flex flex-column align-items-center">
                             <li v-for="(link, idx) in item.links" :key="idx">
-                                <router-link :to="link.route">{{ link.text }}</router-link>
+                                <router-link
+                                    :to="link.route"
+                                    :class="{
+                                        active: activeLinkIndex === idx
+                                    }"
+                                    @click.stop="setActive(index, idx)"
+                                    >{{ link.text }}</router-link
+                                >
                             </li>
                         </ul>
                     </div>
                 </li>
             </ul>
             <div class="logout d-flex flex-column align-items-center">
-                <button class="btn-logout">登出</button>
+                <button class="btn-logout">
+                    <router-link to="/">登出</router-link>
+                </button>
             </div>
         </div>
         <div class="router-page">
@@ -51,6 +61,7 @@ export default {
     data() {
         return {
             activeIndex: null,
+            activeLinkIndex: null,
             navItems: [
                 {
                     title: '首頁管理',
@@ -113,7 +124,21 @@ export default {
     },
     methods: {
         toggle(index) {
-            this.activeIndex = this.activeIndex === index ? null : index
+            // 切换 activeIndex，确保可以展开和收起
+            if (this.activeIndex === index) {
+                this.activeIndex = null
+            } else {
+                this.activeIndex = index
+            }
+        },
+        setActive(parentIndex, linkIndex) {
+            // 设置或取消子链接的活动状态
+            if (this.activeIndex === parentIndex && this.activeLinkIndex === linkIndex) {
+                // this.activeLinkIndex = null // 如果点击当前活跃链接，则取消 active 状态
+            } else {
+                this.activeIndex = parentIndex
+                this.activeLinkIndex = linkIndex // 设置被点击链接的索引为 active
+            }
         }
     }
 }
@@ -136,16 +161,26 @@ section {
         top: 0;
         left: 0;
         .title {
-            width: 70%;
-            margin: 15px 0;
-            text-align: center;
+            width: 60%;
+            margin: 10px 0;
+            // text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: solid 1px #d9d9d9;
+
             a {
                 font-size: 2.25em;
                 color: #fff;
-                padding-bottom: 20px;
-                border-bottom: solid 1px #d9d9d9;
+                padding-bottom: 10px;
                 text-decoration: none;
                 display: block;
+                .pic-logo {
+                    width: 70px;
+                    img {
+                        width: 100%;
+                    }
+                }
             }
         }
         .list-unstyled {
@@ -183,6 +218,12 @@ section {
                                     color: #e76900;
                                 }
                             }
+                            .router-link-exact-active {
+                                color: #e76900;
+                            }
+                            // .active {
+                            //     color: #e76900;
+                            // }
                         }
                     }
                 }
@@ -196,11 +237,14 @@ section {
                 background-color: #e76900;
                 border: none;
                 padding: 6px 30px;
-                color: #fff;
                 border-radius: 20px;
                 transition: 0.5s;
                 &:hover {
                     background-color: $red;
+                }
+                a {
+                    text-decoration: none;
+                    color: #fff;
                 }
             }
         }
