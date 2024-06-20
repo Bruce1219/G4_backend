@@ -54,7 +54,7 @@ export default {
                     level: 1,
                     account: 'xiaoming.zhang@example.com',
                     password: '111111',
-                    status: '正常'
+                    status: ''
                 },
                 {
                     id: '002',
