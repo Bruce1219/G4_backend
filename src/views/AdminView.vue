@@ -65,21 +65,21 @@ export default {
                 },
                 {
                     id: '003',
-                    level: 3,
+                    level: 2,
                     account: 'dahua.wang@example.com',
                     password: '22222',
                     status: '停用'
                 },
                 {
                     id: '004',
-                    level: 3,
+                    level: 2,
                     account: 'shufen.chen@example.com',
                     password: '33333',
                     status: '正常'
                 },
                 {
                     id: '005',
-                    level: 3,
+                    level: 2,
                     account: 'zhiqiang.lin@example.com',
                     password: '4444',
                     status: '停用'
