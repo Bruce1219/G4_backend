@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
+import { useAdminStore } from '@/store/adminState.js'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -13,6 +14,7 @@ const router = createRouter({
             path: '/indexsidebar',
             name: 'indexsidebar',
             component: () => import('@/components/IndexSidebar.vue'),
+            meta: { requiresAuth: true }, //路由守衛
             children: [
                 {
                     path: 'farm',
@@ -72,6 +74,26 @@ const router = createRouter({
             ]
         }
     ]
+})
+
+//路由守衛
+router.beforeEach(async (to, from, next) => {
+    const adminStore = useAdminStore()
+
+    // 確保從 localStorage 加載當前用戶
+    if (!adminStore.currentUser) {
+        await adminStore.loadCurrentUser()
+    }
+
+    if (to.matched.some((record) => record.meta.requiresAuth)) {
+        if (!adminStore.currentUser) {
+            next({ path: '/' })
+        } else {
+            next()
+        }
+    } else {
+        next()
+    }
 })
 
 export default router

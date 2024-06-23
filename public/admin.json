@@ -1,0 +1,44 @@
+[
+    {
+        "id": "001",
+        "level": 1,
+        "account": "admin001",
+        "password": "001",
+        "status": ""
+    },
+    {
+        "id": "002",
+        "level": 2,
+        "account": "admin002",
+        "password": "002",
+        "status": "正常"
+    },
+    {
+        "id": "003",
+        "level": 2,
+        "account": "admin003",
+        "password": "003",
+        "status": "正常"
+    },
+    {
+        "id": "004",
+        "level": 2,
+        "account": "admin004",
+        "password": "004",
+        "status": "正常"
+    },
+    {
+        "id": "005",
+        "level": 2,
+        "account": "admin005",
+        "password": "005",
+        "status": "正常"
+    },
+    {
+        "id": "006",
+        "level": 2,
+        "account": "admin006",
+        "password": "006",
+        "status": "停用"
+    }
+]

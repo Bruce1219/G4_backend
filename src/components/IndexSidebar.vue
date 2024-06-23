@@ -2,7 +2,7 @@
     <section>
         <div class="maintitle">
             <h1>果籽後台</h1>
-            <span>管理員 : {{ am_no }}</span>
+            <span>管理員 : {{ store.$state.currentAccount }}</span>
         </div>
         <div class="sidebar-nav d-flex flex-column align-items-center">
             <div class="title">
@@ -49,7 +49,7 @@
                 </li>
             </ul>
             <div class="logout d-flex flex-column align-items-center">
-                <router-link class="btn-logout" to="/">登出</router-link>
+                <button @click="memsignout" class="btn-logout">登出</button>
             </div>
         </div>
         <div class="router-page">
@@ -59,6 +59,8 @@
 </template>
 
 <script>
+import { useAdminStore } from '@/store/adminState.js'
+
 export default {
     data() {
         return {
@@ -125,6 +127,12 @@ export default {
             ]
         }
     },
+    setup() {
+        const store = useAdminStore()
+        return {
+            store
+        }
+    },
     methods: {
         toggle(index) {
             // 切换 activeIndex，确保可以展开和收起
@@ -141,6 +149,18 @@ export default {
             } else {
                 this.activeIndex = parentIndex
                 this.activeLinkIndex = linkIndex // 设置被点击链接的索引为 active
+            }
+        },
+        async memsignout() {
+            try {
+                const store = useAdminStore() // 獲取 Pinia store
+
+                store.clearCurrentUser() // 設置當前用戶到 Pinia
+                alert('已登出')
+                this.$router.push('/')
+            } catch (error) {
+                console.error('發生錯誤:', error)
+                alert('發生錯誤')
             }
         }
     }

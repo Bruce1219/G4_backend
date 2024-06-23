@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>管理員管理</h1>
-                <button>+ 新增管理員</button>
+                <button v-if="this.store.$state.currentAccount === 'admin001'">+ 新增管理員</button>
             </div>
             <table>
                 <thead>
@@ -45,51 +45,69 @@
 </template>
 
 <script>
+import { useAdminStore } from '@/store/adminState.js' // 引入 Pinia store
+
 export default {
     data() {
         return {
-            admin: [
-                {
-                    id: '001',
-                    level: 1,
-                    account: 'xiaoming.zhang@example.com',
-                    password: '111111',
-                    status: ''
-                },
-                {
-                    id: '002',
-                    level: 2,
-                    account: 'meili.li@example.com',
-                    password: '00000',
-                    status: '正常'
-                },
-                {
-                    id: '003',
-                    level: 2,
-                    account: 'dahua.wang@example.com',
-                    password: '22222',
-                    status: '停用'
-                },
-                {
-                    id: '004',
-                    level: 2,
-                    account: 'shufen.chen@example.com',
-                    password: '33333',
-                    status: '正常'
-                },
-                {
-                    id: '005',
-                    level: 2,
-                    account: 'zhiqiang.lin@example.com',
-                    password: '4444',
-                    status: '停用'
-                }
-            ]
+            // admin: [
+            //     {
+            //         id: '001',
+            //         level: 1,
+            //         account: 'xiaoming.zhang@example.com',
+            //         password: '111111',
+            //         status: ''
+            //     },
+            //     {
+            //         id: '002',
+            //         level: 2,
+            //         account: 'meili.li@example.com',
+            //         password: '00000',
+            //         status: '正常'
+            //     },
+            //     {
+            //         id: '003',
+            //         level: 2,
+            //         account: 'dahua.wang@example.com',
+            //         password: '22222',
+            //         status: '停用'
+            //     },
+            //     {
+            //         id: '004',
+            //         level: 2,
+            //         account: 'shufen.chen@example.com',
+            //         password: '33333',
+            //         status: '正常'
+            //     },
+            //     {
+            //         id: '005',
+            //         level: 2,
+            //         account: 'zhiqiang.lin@example.com',
+            //         password: '4444',
+            //         status: '停用'
+            //     }
+            // ]
+            admin: []
         }
+    },
+    setup() {
+        const store = useAdminStore()
+        return {
+            store
+        }
+    },
+    mounted() {
+        fetch(`${import.meta.env.BASE_URL}admin.json`)
+            .then((res) => res.json())
+            .then((json) => {
+                this.admin = json
+            })
     },
     methods: {
         toggleStatus(user) {
-            user.status = user.status === '正常' ? '停用' : '正常'
+            if (this.store.$state.currentAccount === 'admin001') {
+                user.status = user.status === '正常' ? '停用' : '正常'
+            }
         }
     }
 }
