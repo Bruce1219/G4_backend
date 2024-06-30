@@ -9,7 +9,7 @@ export const useAdminStore = defineStore('admin', {
         setCurrentUser(user) {
             this.currentUser = user
             if (user) {
-                this.currentAccount = user.account // 提取並儲存用戶帳號
+                this.currentAccount = user.am_account // 提取並儲存用戶帳號
                 localStorage.setItem('currentUser', JSON.stringify(user))
             } else {
                 this.currentAccount = null // 清空帳號資料

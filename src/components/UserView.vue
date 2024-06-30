@@ -1,7 +1,7 @@
 <template>
     <section class="d-flex justify-content-center">
         <div class="loginbox">
-            <form>
+            <form action="#">
                 <div class="title">
                     <h1>管理員登入</h1>
                 </div>
@@ -61,25 +61,52 @@ export default {
             }
         },
         async memLogin() {
+            // try {
+            //     const store = useAdminStore() // 獲取 Pinia store 的實例
+
+            //     const response = await fetch(`${import.meta.env.BASE_URL}admin.json`)
+            //     const users = await response.json()
+
+            //     const loggedInUser = users.find(
+            //         (u) => u.account === this.acc && u.password === this.psw
+            //     )
+            //     if (loggedInUser) {
+            //         store.setCurrentUser(loggedInUser) // 設置當前用戶到 Pinia
+            //         alert('登入成功!')
+            //         this.acc = ''
+            //         this.psw = ''
+            //         this.$router.push('/indexsidebar/admin')
+            //     } else {
+            //         alert('帳號或密碼錯誤!')
+            //         this.acc = ''
+            //         this.psw = ''
+            //     }
+            // } catch (error) {
+            //     console.error('登入失敗:', error)
+            //     alert('登入失敗')
+            // }
             try {
                 const store = useAdminStore() // 獲取 Pinia store 的實例
 
-                const response = await fetch(`${import.meta.env.BASE_URL}admin.json`)
+                const url = `http://localhost/php_g4/admin.php`
+                let body = {
+                    acc: this.acc,
+                    psw: this.psw
+                }
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                })
                 const users = await response.json()
-
-                const loggedInUser = users.find(
-                    (u) => u.account === this.acc && u.password === this.psw
-                )
-                if (loggedInUser) {
-                    store.setCurrentUser(loggedInUser) // 設置當前用戶到 Pinia
-                    alert('登入成功!')
+                console.log(users['data'])
+                if (users.code != 200) {
+                    alert(users.msg)
                     this.acc = ''
                     this.psw = ''
-                    this.$router.push('/indexsidebar/admin')
                 } else {
-                    alert('帳號或密碼錯誤!')
-                    this.acc = ''
-                    this.psw = ''
+                    store.setCurrentUser(users['data']) // 設置當前用戶到 Pinia
+                    alert('登入成功!')
+                    this.$router.push('/indexsidebar/admin')
                 }
             } catch (error) {
                 console.error('登入失敗:', error)

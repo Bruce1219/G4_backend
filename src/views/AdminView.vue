@@ -3,7 +3,9 @@
         <div class="container">
             <div>
                 <h1>管理員管理</h1>
-                <button v-if="this.store.$state.currentAccount === 'admin001'">+ 新增管理員</button>
+                <button v-if="this.currentAccount === 'admin001'" @click="addAdmin">
+                    + 新增管理員
+                </button>
             </div>
             <table>
                 <thead>
@@ -24,14 +26,14 @@
                         <td>
                             <button
                                 class="normal"
-                                v-if="user.status === '正常'"
+                                v-if="user.status === 1"
                                 @click="toggleStatus(user)"
                             >
                                 正常
                             </button>
                             <button
                                 class="useless"
-                                v-if="user.status === '停用'"
+                                v-if="user.status === 0"
                                 @click="toggleStatus(user)"
                             >
                                 停用
@@ -42,6 +44,11 @@
             </table>
         </div>
     </section>
+    <div class="section-addAdmin" v-show="addSwitch">
+        <div class="addAdmin">
+            <h2>新增管理員</h2>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -87,7 +94,9 @@ export default {
             //         status: '停用'
             //     }
             // ]
-            admin: []
+            currentAccount: null,
+            admin: [],
+            addSwitch: false
         }
     },
     setup() {
@@ -105,10 +114,24 @@ export default {
     },
     methods: {
         toggleStatus(user) {
-            if (this.store.$state.currentAccount === 'admin001') {
-                user.status = user.status === '正常' ? '停用' : '正常'
+            if (this.currentAccount === 'admin001') {
+                user.status = user.status === 1 ? 0 : 1
+                console.log(user.status)
+            }
+        },
+        addAdmin() {
+            this.addSwitch = true
+        },
+        loadCurrentAccount() {
+            const user = localStorage.getItem('currentUser')
+            if (user) {
+                const parsedUser = JSON.parse(user)
+                this.currentAccount = parsedUser.am_account // 使用正確的鍵名
             }
         }
+    },
+    created() {
+        this.loadCurrentAccount()
     }
 }
 </script>
@@ -233,6 +256,25 @@ export default {
                 }
             }
         }
+    }
+}
+.section-addAdmin {
+    background-color: hsla(0, 0%, 0%, 0.25);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 21;
+    top: 0;
+    .addAdmin {
+        overflow: auto;
+        width: 73.64vw;
+        height: 45vw;
+        background-color: #f5efeb;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
     }
 }
 </style>

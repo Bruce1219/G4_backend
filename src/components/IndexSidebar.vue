@@ -2,7 +2,7 @@
     <section>
         <div class="maintitle">
             <h1>果籽後台</h1>
-            <span>管理員 : {{ store.$state.currentAccount }}</span>
+            <span>管理員 : {{ currentAccount }}</span>
         </div>
         <div class="sidebar-nav d-flex flex-column align-items-center">
             <div class="title">
@@ -64,6 +64,7 @@ import { useAdminStore } from '@/store/adminState.js'
 export default {
     data() {
         return {
+            currentAccount: null,
             am_no: '001',
             activeIndex: null,
             activeLinkIndex: null,
@@ -162,7 +163,17 @@ export default {
                 console.error('發生錯誤:', error)
                 alert('發生錯誤')
             }
+        },
+        loadCurrentAccount() {
+            const user = localStorage.getItem('currentUser')
+            if (user) {
+                const parsedUser = JSON.parse(user)
+                this.currentAccount = parsedUser.am_account // 使用正確的鍵名
+            }
         }
+    },
+    created() {
+        this.loadCurrentAccount()
     }
 }
 </script>
@@ -176,6 +187,9 @@ section {
     cursor: default;
     width: 100%;
     .maintitle {
+        width: 100%;
+        position: fixed;
+        top: 0;
         background-color: $darkGreen;
         padding: 10px 0;
         display: flex;
@@ -294,6 +308,7 @@ section {
     }
     .router-page {
         width: 100%;
+        margin-top: 80px;
     }
 }
 </style>
