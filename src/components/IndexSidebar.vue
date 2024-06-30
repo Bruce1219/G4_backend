@@ -1,11 +1,16 @@
 <template>
     <section>
-        <!-- <div class="title">
+        <div class="maintitle">
             <h1>果籽後台</h1>
-        </div> -->
+            <span>管理員 : {{ currentAccount }}</span>
+        </div>
         <div class="sidebar-nav d-flex flex-column align-items-center">
             <div class="title">
-                <router-link to="/">果籽後台</router-link>
+                <router-link to="/indexsidebar/admin">
+                    <div class="pic-logo">
+                        <img src="../assets/image/logo.png" alt="" />
+                    </div>
+                </router-link>
             </div>
             <ul class="list-unstyled ps-0">
                 <li
@@ -13,13 +18,13 @@
                     v-for="(item, index) in navItems"
                     :key="index"
                 >
+                    <!-- data-bs-toggle="collapse"
+                :data-bs-target="item.target" -->
                     <button
                         class="collapsed"
                         :class="{ 'active-button': activeIndex === index }"
-                        data-bs-toggle="collapse"
-                        :data-bs-target="item.target"
-                        aria-expanded="false"
-                        @click="toggle(index)"
+                        :aria-expanded="activeIndex === index"
+                        @click.stop="toggle(index)"
                     >
                         {{ item.title }}
                     </button>
@@ -30,33 +35,48 @@
                     >
                         <ul class="d-flex flex-column align-items-center">
                             <li v-for="(link, idx) in item.links" :key="idx">
-                                <router-link :to="link.route">{{ link.text }}</router-link>
+                                <router-link
+                                    :to="link.route"
+                                    :class="{
+                                        active: activeLinkIndex === idx
+                                    }"
+                                    @click.stop="setActive(index, idx)"
+                                    >{{ link.text }}</router-link
+                                >
                             </li>
                         </ul>
                     </div>
                 </li>
             </ul>
             <div class="logout d-flex flex-column align-items-center">
-                <button class="btn-logout">登出</button>
+                <button @click="memsignout" class="btn-logout">登出</button>
             </div>
+        </div>
+        <div class="router-page">
+            <router-view></router-view>
         </div>
     </section>
 </template>
 
 <script>
+import { useAdminStore } from '@/store/adminState.js'
+
 export default {
     data() {
         return {
+            currentAccount: null,
+            am_no: '001',
             activeIndex: null,
+            activeLinkIndex: null,
             navItems: [
                 {
                     title: '首頁管理',
                     target: '#home-collapse',
                     collapseId: 'home-collapse',
                     links: [
-                        { route: '/farm', text: '農場' },
-                        { route: '/news', text: '最新消息' },
-                        { route: '/chatbox', text: '客服機器人' }
+                        { route: '/indexsidebar/farm', text: '農場' },
+                        { route: '/indexsidebar/news', text: '最新消息' },
+                        { route: '/indexsidebar/chatbox', text: '客服機器人' }
                     ]
                 },
                 {
@@ -64,7 +84,7 @@ export default {
                     target: '#member-collapse',
                     collapseId: 'member-collapse',
                     links: [
-                        { route: '/member', text: '會員' }
+                        { route: '/indexsidebar/member', text: '會員' }
                         // { route: '/coupons', text: '會員擁有優惠卷' },
                         // { route: '/favorites', text: '會員收藏商品' }
                     ]
@@ -74,9 +94,9 @@ export default {
                     target: '#product-collapse',
                     collapseId: 'product-collapse',
                     links: [
-                        { route: '/product', text: '商品' },
+                        { route: '/indexsidebar/product', text: '商品' },
                         // { route: '/categories', text: '商品分類' },
-                        { route: '/porders', text: '商品訂單' }
+                        { route: '/indexsidebar/porders', text: '商品訂單' }
                         // { route: '/details', text: '商品明細' }
                     ]
                 },
@@ -85,33 +105,75 @@ export default {
                     target: '#activity-collapse',
                     collapseId: 'activity-collapse',
                     links: [
-                        { route: '/activity', text: '活動' },
+                        { route: '/indexsidebar/activity', text: '活動' },
                         // { route: '/activity-categories', text: '活動分類' },
-                        { route: '/aorders', text: '活動訂單' }
+                        { route: '/indexsidebar/aorders', text: '活動訂單' }
                     ]
                 },
                 {
                     title: '遊戲管理',
                     target: '#game-collapse',
                     collapseId: 'game-collapse',
-                    links: [{ route: '/game', text: '食農問答' }]
+                    links: [{ route: '/indexsidebar/game', text: '食農問答' }]
                 },
                 {
                     title: '後台管理',
                     target: '#back-collapse',
                     collapseId: 'back-collapse',
                     links: [
-                        { route: '/admin', text: '管理員' },
-                        { route: '/coupon', text: '優惠卷' }
+                        { route: '/indexsidebar/admin', text: '管理員' },
+                        { route: '/indexsidebar/coupon', text: '優惠卷' }
                     ]
                 }
             ]
         }
     },
+    setup() {
+        const store = useAdminStore()
+        return {
+            store
+        }
+    },
     methods: {
         toggle(index) {
-            this.activeIndex = this.activeIndex === index ? null : index
+            // 切换 activeIndex，确保可以展开和收起
+            if (this.activeIndex === index) {
+                this.activeIndex = null
+            } else {
+                this.activeIndex = index
+            }
+        },
+        setActive(parentIndex, linkIndex) {
+            // 设置或取消子链接的活动状态
+            if (this.activeIndex === parentIndex && this.activeLinkIndex === linkIndex) {
+                // this.activeLinkIndex = null // 如果点击当前活跃链接，则取消 active 状态
+            } else {
+                this.activeIndex = parentIndex
+                this.activeLinkIndex = linkIndex // 设置被点击链接的索引为 active
+            }
+        },
+        async memsignout() {
+            try {
+                const store = useAdminStore() // 獲取 Pinia store
+
+                store.clearCurrentUser() // 設置當前用戶到 Pinia
+                alert('已登出')
+                this.$router.push('/')
+            } catch (error) {
+                console.error('發生錯誤:', error)
+                alert('發生錯誤')
+            }
+        },
+        loadCurrentAccount() {
+            const user = localStorage.getItem('currentUser')
+            if (user) {
+                const parsedUser = JSON.parse(user)
+                this.currentAccount = parsedUser.am_account // 使用正確的鍵名
+            }
         }
+    },
+    created() {
+        this.loadCurrentAccount()
     }
 }
 </script>
@@ -122,10 +184,31 @@ section {
     line-height: $lineheight;
     letter-spacing: $letterSpacing;
     font-family: $pFont;
+    cursor: default;
     width: 100%;
+    .maintitle {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        background-color: $darkGreen;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-evenly;
+        align-items: center;
+        h1 {
+            color: #fff;
+            font-family: $titleFont;
+            font-weight: bold;
+            font-size: 2.5em;
+        }
+        span {
+            color: #fff;
+        }
+    }
     .sidebar-nav {
         width: 20%;
         background-color: $darkGreen;
+        box-shadow: 0 0 6px hsla(0, 0%, 0%, 0.4);
         // padding-left: 50px;
         padding-top: 10px;
         height: 100vh;
@@ -133,16 +216,26 @@ section {
         top: 0;
         left: 0;
         .title {
-            width: 70%;
-            margin: 15px 0;
-            text-align: center;
+            width: 60%;
+            margin: 10px 0;
+            // text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-bottom: solid 1px #d9d9d9;
+
             a {
                 font-size: 2.25em;
                 color: #fff;
-                padding-bottom: 20px;
-                border-bottom: solid 1px #d9d9d9;
+                padding-bottom: 10px;
                 text-decoration: none;
                 display: block;
+                .pic-logo {
+                    width: 70px;
+                    img {
+                        width: 100%;
+                    }
+                }
             }
         }
         .list-unstyled {
@@ -180,6 +273,12 @@ section {
                                     color: #e76900;
                                 }
                             }
+                            .router-link-exact-active {
+                                color: #e76900;
+                            }
+                            // .active {
+                            //     color: #e76900;
+                            // }
                         }
                     }
                 }
@@ -190,17 +289,26 @@ section {
             padding-top: 20px;
             border-top: solid 1px #d9d9d9;
             .btn-logout {
+                color: #fff;
+                text-decoration: none;
                 background-color: #e76900;
                 border: none;
                 padding: 6px 30px;
-                color: #fff;
                 border-radius: 20px;
                 transition: 0.5s;
                 &:hover {
                     background-color: $red;
                 }
+                a {
+                    text-decoration: none;
+                    color: #fff;
+                }
             }
         }
+    }
+    .router-page {
+        width: 100%;
+        margin-top: 80px;
     }
 }
 </style>

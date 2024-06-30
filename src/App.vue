@@ -1,22 +1,20 @@
 <template>
     <RouterView />
-    <IndexSidebar />
+    <!-- <IndexSidebar /> -->
 </template>
 
 <script>
 import './assets/scss/base/_reset.scss'
 import { RouterView } from 'vue-router'
-import IndexSidebar from '@/components/IndexSidebar.vue'
+// import IndexSidebar from '@/components/IndexSidebar.vue'
 
 export default {
     name: 'App',
     components: {
-        RouterView,
-        IndexSidebar
+        RouterView
+        // IndexSidebar
     }
 }
 </script>
 
-<style lang="scss">
-// @import './assets/all.scss';
-</style>
+<style lang="scss"></style>

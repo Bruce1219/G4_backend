@@ -1,16 +1,14 @@
 <template>
-  <main>
-    <IndexSidebar />
-  </main>
+    <UserView />
 </template>
 
 <script>
-import IndexSidebar from '@/components/IndexSidebar.vue'
+import UserView from '@/components/UserView.vue'
 
 export default {
-  components: {
-    IndexSidebar
-  }
+    components: {
+        UserView
+    }
 }
 </script>
 
