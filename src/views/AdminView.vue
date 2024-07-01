@@ -246,7 +246,7 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
-        height: 85vh;
+        height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
         div {
@@ -275,6 +275,7 @@ export default {
             }
         }
         .wrap-table {
+            //有scrollbar
             width: 100%;
             height: 75%;
             overflow: auto;
