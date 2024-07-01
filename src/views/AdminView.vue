@@ -4,7 +4,7 @@
             <div>
                 <h1>管理員管理</h1>
                 <button
-                    v-if="currentUser && currentUser.am_level === '1'"
+                    v-if="currentUser && currentUser.am_level == '1'"
                     @click="addAdmin($event)"
                 >
                     + 新增管理員
@@ -177,6 +177,7 @@ export default {
             if (user) {
                 this.currentUser = JSON.parse(user)
             }
+            console.log(this.currentUser )
         },
         fetchData() {
             let body = {
