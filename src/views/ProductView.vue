@@ -53,6 +53,26 @@
         <div class="addAdmin" @click.stop>
             <h2>新增管理員</h2>
             <form action="#">
+                <!-- <div>
+                    <span>管理員代號 : </span>
+                    <input
+                        type="text"
+                        name=""
+                        id=""
+                        placeholder="請輸入管理員編號"
+                        v-model="am_no"
+                    />
+                </div> -->
+                <!-- <div>
+                    <span>管理員帳號 : </span>
+                    <input
+                        type="text"
+                        name=""
+                        id=""
+                        placeholder="請輸入管理員帳號"
+                        v-model="am_account"
+                    />
+                </div> -->
                 <div>
                     <span>管理員密碼 : </span>
                     <input
