@@ -3,9 +3,10 @@
         <div class="container">
             <div>
                 <h1>商品管理</h1>
-                <button>+ 新增商品</button>
+                <button @click="addAdmin($event)">+ 新增商品</button>
             </div>
-            <table>
+            <div class="wrap-table">
+                <table>
                 <thead>
                     <tr>
                         <th scope="col">商品編號</th>
@@ -44,14 +45,54 @@
                     </tr>
                 </tbody>
             </table>
+            </div>
+            
         </div>
     </section>
+    <div class="section-addAdmin" v-show="addSwitch" @click="addAdmin($event)">
+        <div class="addAdmin" @click.stop>
+            <h2>新增管理員</h2>
+            <form action="#">
+                <div>
+                    <span>管理員密碼 : </span>
+                    <input
+                        type="text"
+                        name=""
+                        id=""
+                        placeholder="請輸入管理員密碼"
+                        v-model="am_password"
+                    />
+                </div>
+                <div>
+                    <span>管理員等級 : </span>
+                    <select v-model="am_level">
+                        <option value="" disabled selected>請選擇管理員等級</option>
+                        <option value="1">超級管理員</option>
+                        <option value="2">一般管理員</option>
+                    </select>
+                </div>
+                <div>
+                    <span>管理員狀態 : </span>
+                    <select v-model="am_status">
+                        <option value="" disabled selected>請選擇管理員狀態</option>
+                        <option value="1">正常</option>
+                        <option value="0">停權</option>
+                    </select>
+                </div>
+                <div class="button">
+                    <button type="button" class="cancel" @click="addAdmin($event)">取消</button>
+                    <button type="button" class="confirm" @click="confirm()">儲存</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </template>
 
 <script>
 export default {
     data() {
         return {
+            addSwitch: false,
             product: [
                 {
                     n_no: 'A001',
@@ -101,6 +142,48 @@ export default {
         // },
         parsePic(file) {
             return new URL(`../assets/image/${file}`, import.meta.url).href
+        },
+        addAdmin(event) {
+            event.stopPropagation() // 阻止事件冒泡
+            if (this.addSwitch === false) {
+                this.addSwitch = true
+                console.log(this.addSwitch)
+            } else {
+                this.addSwitch = false
+                ;(this.am_password = ''), (this.am_level = ''), (this.am_status = '')
+            }
+        },
+        confirm() {
+            if (this.am_password === '' || this.am_level === '' || this.am_status === '') {
+                alert('請填完所有欄位')
+                return false
+            }
+            const url = `http://localhost/php_g4/addAdmin.php`
+            let body = {
+                am_account: this.am_account,
+                am_password: this.am_password,
+                am_level: this.am_level,
+                am_status: this.am_status
+            }
+
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            })
+                .then((response) => response.json())
+                .then((json) => {
+                    this.data = json
+                    if (this.data.code === 200) {
+                        alert('新增成功')
+                        this.addSwitch = false
+                        this.fetchData() // 新增成功後重新獲取資料
+                    } else {
+                        alert(this.data.msg)
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error)
+                })
         }
     }
 }
@@ -119,6 +202,7 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
+        height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
         div {
@@ -146,8 +230,13 @@ export default {
                 }
             }
         }
-
-        table {
+        .wrap-table{
+            //有scrollbar
+            width: 100%;
+            height: 75%;
+            overflow: auto;
+            margin-top: 30px;
+            table {
             width: 100%;
             margin-top: 30px;
             // border: solid 1px $darkGreen;
@@ -225,6 +314,121 @@ export default {
                 transition: 0.5s;
                 &:hover {
                     background-color: $red;
+                }
+            }
+        }
+        }
+
+    }
+}
+.section-addAdmin {
+    background-color: hsla(0, 0%, 0%, 0.7);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 21;
+    top: 0;
+    .addAdmin {
+        overflow: auto;
+        width: 50%;
+        height: 75%;
+        background-color: $bcgw;
+        border-radius: 20px;
+        padding: 40px 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        h2 {
+            color: $darkGreen;
+            font-size: 2.25rem;
+            font-family: $titleFont;
+            font-weight: bold;
+        }
+        form {
+            margin-top: 50px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            div {
+                width: 80%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin: 10px 0;
+                input {
+                    width: 70%;
+                    height: 35px;
+                    border: solid 1px $darkGreen;
+                    padding: 8px 15px;
+                    outline: none;
+                    &:focus {
+                        outline: none;
+                        &::placeholder {
+                            color: transparent;
+                        }
+                    }
+                }
+                select {
+                    width: 70%;
+                    height: 35px;
+                    border: solid 1px $darkGreen;
+                    padding: 0 14px;
+                    outline: none;
+                    color: grey;
+                    &:focus {
+                        outline: none;
+                        &::placeholder {
+                            color: transparent;
+                        }
+                    }
+                }
+            }
+            .button {
+                width: 35%;
+                margin-top: 50px;
+                button {
+                    display: inline-block;
+                    text-decoration: none;
+                    border-radius: 25px;
+                    border: 1px solid #eee;
+                    background-color: #144433;
+                    color: #fff;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    padding: 7px 30px;
+                    letter-spacing: 1px;
+                    transition: transform 0.5s ease-in;
+                    transition: 0.5s;
+                    text-align: center;
+                    &:active {
+                        transform: scale(0.9);
+                    }
+                    &:hover {
+                        background-color: #fff;
+                        color: #144433;
+                        border: solid 1px #144433;
+                    }
+                    &:focus {
+                        outline: none;
+                        &::placeholder {
+                            color: transparent;
+                        }
+                    }
+                }
+                .cancel {
+                    background-color: $red;
+                    color: #fff;
+                    &:hover {
+                        background-color: #fff;
+                        color: $red;
+                        border: solid 1px $red;
+                    }
                 }
             }
         }
