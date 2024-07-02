@@ -61,30 +61,6 @@ export default {
             }
         },
         async memLogin() {
-            // try {
-            //     const store = useAdminStore() // 獲取 Pinia store 的實例
-
-            //     const response = await fetch(`${import.meta.env.BASE_URL}admin.json`)
-            //     const users = await response.json()
-
-            //     const loggedInUser = users.find(
-            //         (u) => u.account === this.acc && u.password === this.psw
-            //     )
-            //     if (loggedInUser) {
-            //         store.setCurrentUser(loggedInUser) // 設置當前用戶到 Pinia
-            //         alert('登入成功!')
-            //         this.acc = ''
-            //         this.psw = ''
-            //         this.$router.push('/indexsidebar/admin')
-            //     } else {
-            //         alert('帳號或密碼錯誤!')
-            //         this.acc = ''
-            //         this.psw = ''
-            //     }
-            // } catch (error) {
-            //     console.error('登入失敗:', error)
-            //     alert('登入失敗')
-            // }
             try {
                 const store = useAdminStore() // 獲取 Pinia store 的實例
 
