@@ -47,7 +47,6 @@ export default {
                     q_explain: '',
                     q_answer: '混合農業',
                     ao_ordertime: '2024/06/11',
-                    a_fee: 2000,
                     ao_status: '正常'
                 },
                 {
@@ -56,7 +55,6 @@ export default {
                     q_explain: '',
                     q_answer: '有機肥料',
                     ao_ordertime: '2024/06/09',
-                    a_fee: 0,
                     ao_status: '正常'
                 },
                 {
@@ -65,7 +63,6 @@ export default {
                     q_explain: '',
                     q_answer: '豆類',
                     ao_ordertime: '2024/06/03',
-                    a_fee: 0,
                     ao_status: '取消'
                 },
                 {
@@ -74,7 +71,6 @@ export default {
                     q_explain: '',
                     q_answer: '滴灌',
                     ao_ordertime: '2024/06/02',
-                    a_fee: 500,
                     ao_status: '正常'
                 },
                 {
@@ -83,7 +79,6 @@ export default {
                     q_explain: '',
                     q_answer: '化學除草劑',
                     ao_ordertime: '2024/06/01',
-                    a_fee: 1500,
                     ao_status: '停用'
                 }
             ]
