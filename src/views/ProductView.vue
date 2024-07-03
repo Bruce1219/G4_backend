@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>商品管理</h1>
-                <button  @click="showAddModal">+ 新增商品</button>
+                <button @click="showAddModal">+ 新增題目</button>
             </div>
             <div class="wrap-table">
                 <table>
@@ -49,11 +49,16 @@
             
         </div>
     </section>
-    <div class="modal" v-if="showAddQuestionModal || showEditQuestionModal">
-            <div class="modal-content">
+    <!-- 新增/編輯題目的彈出視窗 -->
+    <div class="modal" v-if="showAddQuestionModal || showEditQuestionModal" @click="closeModalIfBackgroundClicked">
+            <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
                 <form @submit.prevent="saveQuestion">
+                    <!-- 問題題號輸入 -->
+                    <label for="questionNo">問題題號</label>
+                    <input type="text" id="questionNo" v-model="currentQuestion.no" required :disabled="showEditQuestionModal" />
+
                     <!-- 問題題目輸入 -->
                     <label for="question">問題題目</label>
                     <input type="text" id="question" v-model="currentQuestion.question" required />
@@ -77,16 +82,8 @@
 
                     <!-- 解答圖片上傳 -->
                     <label for="answer_image">解答圖片</label>
-                    <input
-                        type="file"
-                        id="answer_image"
-                        @change="handleImageUpload($event, 'answer')"
-                    />
-                    <input
-                        type="text"
-                        v-model="currentQuestion.answer_image"
-                        placeholder="圖片檔名"
-                    />
+                    <input type="file" id="answer_image" @change="handleImageUpload($event, 'answer')" />
+                    <input type="text" v-model="currentQuestion.answer_image" placeholder="圖片檔名" />
 
                     <!-- 選項內容和圖片輸入 -->
                     <template v-for="option in currentQuestion.options" :key="option.key">
@@ -94,11 +91,7 @@
                         <input :id="'option_' + option.key" v-model="option.text" required />
 
                         <label :for="'option_' + option.key + '_image'">{{ option.key }}選項圖片</label>
-                        <input
-                            type="file"
-                            :id="'option_' + option.key + '_image'"
-                            @change="handleImageUpload($event, option.key)"
-                        />
+                        <input type="file" :id="'option_' + option.key + '_image'" @change="handleImageUpload($event, option.key)" />
                         <input type="text" v-model="option.img" placeholder="圖片檔名" />
                     </template>
 
@@ -114,6 +107,7 @@ export default {
     data() {
         return {
             addSwitch: false,
+            currentQuestion: null
             // showAddQuestionModal: false, // 控制添加問題模態框的顯示
             // showEditQuestionModal: false, // 控制編輯問題模態框的顯示
             // product: [
@@ -216,10 +210,10 @@ export default {
         },
         // 顯示添加新問題的模態框
         showAddModal() {
-            this.currentQuestion = this.getEmptyQuestion();
-            this.modalTitle = '新增商品';
-            this.modalAction = '新增';
-            this.showAddQuestionModal = true;
+            this.currentQuestion = this.getEmptyQuestion()
+            this.modalTitle = '新增題目'
+            this.modalAction = '新增'
+            this.showAddQuestionModal = true
         },
     }
 }
