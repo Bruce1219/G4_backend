@@ -3,10 +3,7 @@
         <div class="container">
             <div>
                 <h1>管理員管理</h1>
-                <button
-                    v-if="currentUser && currentUser.am_level == '1'"
-                    @click="addAdmin($event)"
-                >
+                <button v-if="currentUser && currentUser.am_level == '1'" @click="addAdmin($event)">
                     + 新增管理員
                 </button>
             </div>
@@ -177,7 +174,7 @@ export default {
             if (user) {
                 this.currentUser = JSON.parse(user)
             }
-            console.log(this.currentUser )
+            console.log(this.currentUser)
         },
         fetchData() {
             let body = {
@@ -190,7 +187,6 @@ export default {
                 .then((res) => res.json())
                 .then((json) => {
                     this.admin = json['data']['list']
-                    // localStorage.setItem(`user1`, JSON.stringify(json))
                     console.log(json)
                     console.log(this.admin)
                 })
