@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>商品管理</h1>
-                <button @click="addAdmin($event)">+ 新增商品</button>
+                <button  @click="showAddModal">+ 新增商品</button>
             </div>
             <div class="wrap-table">
                 <table>
@@ -40,7 +40,7 @@
                             </select>
                         </td>
                         <td>
-                            <button class="edit">編輯</button>
+                            <button @click="editproduct(product)" class="edit">編輯</button>
                         </td>
                     </tr>
                 </tbody>
@@ -49,63 +49,64 @@
             
         </div>
     </section>
-    <div class="section-addAdmin" v-show="addSwitch" @click="addAdmin($event)">
-        <div class="addAdmin" @click.stop>
-            <h2>新增管理員</h2>
-            <form action="#">
-                <!-- <div>
-                    <span>管理員代號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員編號"
-                        v-model="am_no"
-                    />
-                </div> -->
-                <!-- <div>
-                    <span>管理員帳號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員帳號"
-                        v-model="am_account"
-                    />
-                </div> -->
-                <div>
-                    <span>管理員密碼 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員密碼"
-                        v-model="am_password"
-                    />
-                </div>
-                <div>
-                    <span>管理員等級 : </span>
-                    <select v-model="am_level">
-                        <option value="" disabled selected>請選擇管理員等級</option>
-                        <option value="1">超級管理員</option>
-                        <option value="2">一般管理員</option>
+    <div class="modal" v-if="showAddQuestionModal || showEditQuestionModal">
+            <div class="modal-content">
+                <span class="close" @click="closeModal">&times;</span>
+                <h2>{{ modalTitle }}</h2>
+                <form @submit.prevent="saveQuestion">
+                    <!-- 問題題目輸入 -->
+                    <label for="question">問題題目</label>
+                    <input type="text" id="question" v-model="currentQuestion.question" required />
+
+                    <!-- 正確答案選項選擇 -->
+                    <label for="answer">正確答案選項</label>
+                    <select id="answer" v-model="currentQuestion.answer" required>
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
                     </select>
-                </div>
-                <div>
-                    <span>管理員狀態 : </span>
-                    <select v-model="am_status">
-                        <option value="" disabled selected>請選擇管理員狀態</option>
-                        <option value="1">正常</option>
-                        <option value="0">停權</option>
-                    </select>
-                </div>
-                <div class="button">
-                    <button type="button" class="cancel" @click="addAdmin($event)">取消</button>
-                    <button type="button" class="confirm" @click="confirm()">儲存</button>
-                </div>
-            </form>
+
+                    <!-- 正確答案文字輸入 -->
+                    <label for="correctAnswer">正確答案文字</label>
+                    <input type="text" id="correctAnswer" v-model="currentQuestion.correctAnswer" required />
+
+                    <!-- 解答解釋輸入 -->
+                    <label for="explanation">解答解釋</label>
+                    <textarea id="explanation" v-model="currentQuestion.explanation" required></textarea>
+
+                    <!-- 解答圖片上傳 -->
+                    <label for="answer_image">解答圖片</label>
+                    <input
+                        type="file"
+                        id="answer_image"
+                        @change="handleImageUpload($event, 'answer')"
+                    />
+                    <input
+                        type="text"
+                        v-model="currentQuestion.answer_image"
+                        placeholder="圖片檔名"
+                    />
+
+                    <!-- 選項內容和圖片輸入 -->
+                    <template v-for="option in currentQuestion.options" :key="option.key">
+                        <label :for="'option_' + option.key">{{ option.key }}選項內容</label>
+                        <input :id="'option_' + option.key" v-model="option.text" required />
+
+                        <label :for="'option_' + option.key + '_image'">{{ option.key }}選項圖片</label>
+                        <input
+                            type="file"
+                            :id="'option_' + option.key + '_image'"
+                            @change="handleImageUpload($event, option.key)"
+                        />
+                        <input type="text" v-model="option.img" placeholder="圖片檔名" />
+                    </template>
+
+                    <!-- 提交按鈕 -->
+                    <button type="submit">{{ modalAction }}</button>
+                </form>
+            </div>
         </div>
-    </div>
 </template>
 
 <script>
@@ -113,47 +114,49 @@ export default {
     data() {
         return {
             addSwitch: false,
-            product: [
-                {
-                    n_no: 'A001',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'pumpkin.png',
-                    n_time: '2024-06-04',
-                    p_name: '南瓜',
-                    pc_no: '蔬果',
-                    f_no: '黑壓壓農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: 'A002',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'taro.png',
-                    n_time: '2024-06-04',
-                    p_name: '芋頭',
-                    pc_no: '蔬果',
-                    f_no: '嘿嘿齁農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: 'A003',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'strawberry2.png',
-                    n_time: '2024-06-04',
-                    p_name: '草莓',
-                    pc_no: '蔬果',
-                    f_no: '逼逼波農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                }
-            ]
+            // showAddQuestionModal: false, // 控制添加問題模態框的顯示
+            // showEditQuestionModal: false, // 控制編輯問題模態框的顯示
+            // product: [
+            //     {
+            //         n_no: 'A001',
+            //         n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
+            //         p_img: 'pumpkin.png',
+            //         n_time: '2024-06-04',
+            //         p_name: '南瓜',
+            //         pc_no: '蔬果',
+            //         f_no: '黑壓壓農場',
+            //         p_fee: 600,
+            //         n_status: '',
+            //         isActive: false,
+            //         isClick: false
+            //     },
+            //     {
+            //         n_no: 'A002',
+            //         n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
+            //         p_img: 'taro.png',
+            //         n_time: '2024-06-04',
+            //         p_name: '芋頭',
+            //         pc_no: '蔬果',
+            //         f_no: '嘿嘿齁農場',
+            //         p_fee: 600,
+            //         n_status: '',
+            //         isActive: false,
+            //         isClick: false
+            //     },
+            //     {
+            //         n_no: 'A003',
+            //         n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
+            //         p_img: 'strawberry2.png',
+            //         n_time: '2024-06-04',
+            //         p_name: '草莓',
+            //         pc_no: '蔬果',
+            //         f_no: '逼逼波農場',
+            //         p_fee: 600,
+            //         n_status: '',
+            //         isActive: false,
+            //         isClick: false
+            //     }
+            // ]
         }
     },
     methods: {
@@ -178,7 +181,7 @@ export default {
                 alert('請填完所有欄位')
                 return false
             }
-            const url = `http://localhost/php_g4/addAdmin.php`
+            const url = `http://localhost/php_g4/get_question.php`
             let body = {
                 am_account: this.am_account,
                 am_password: this.am_password,
@@ -204,7 +207,20 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
-        }
+        },
+        editQuestion(question) {
+            this.currentQuestion = JSON.parse(JSON.stringify(question));
+            this.modalTitle = '編輯商品';
+            this.modalAction = '更新';
+            this.showEditQuestionModal = true;
+        },
+        // 顯示添加新問題的模態框
+        showAddModal() {
+            this.currentQuestion = this.getEmptyQuestion();
+            this.modalTitle = '新增商品';
+            this.modalAction = '新增';
+            this.showAddQuestionModal = true;
+        },
     }
 }
 </script>
