@@ -15,6 +15,7 @@
                             <th scope="col">農場名稱</th>
                             <th scope="col">價格</th>
                             <th scope="col">購買單位</th>
+                            <th scope="col">熱門度</th>
                             <th scope="col">操作</th>
                         </tr>
                     </thead>
@@ -26,6 +27,7 @@
                             <td>{{ product.f_name }}</td>
                             <td>NT$ {{ product.p_fee }}</td>
                             <td>{{ product.p_unit }}</td>
+                            <td>{{ product.p_popular === '0' ? '熱門商品' : '一般商品' }}</td>
                             <td>
                                 <button @click="editProduct(product)" class="edit">編輯</button>
                                 <button @click="deleteProduct(product.p_no)" class="delete">刪除</button>
@@ -67,6 +69,12 @@
                     <label for="productUnit">購買單位</label>
                     <input type="text" id="productUnit" v-model="currentProduct.p_unit" required />
 
+                    <label for="productPopular">商品熱門度</label>
+                    <select id="productPopular" v-model="currentProduct.p_popular" required>
+                        <option value="0">熱門商品</option>
+                        <option value="1">一般商品</option>
+                    </select>
+
                     <label for="productDescription">商品描述</label>
                     <textarea id="productDescription" v-model="currentProduct.p_info" required></textarea>
 
@@ -99,19 +107,13 @@ export default {
     computed: {
         sortedProducts() {
             return [...this.products].sort((a, b) => {
-                // 檢查 p_no 是否存在且為字符串
                 const aStr = typeof a.p_no === 'string' ? a.p_no : '';
                 const bStr = typeof b.p_no === 'string' ? b.p_no : '';
-
-                // 使用正則表達式提取數字，並轉換為整數
                 const aNumber = parseInt(aStr.replace(/\D/g, '') || '0', 10);
                 const bNumber = parseInt(bStr.replace(/\D/g, '') || '0', 10);
-
-                // 比較數字
                 return aNumber - bNumber;
             });
         },
-        
         uniqueCategories() {
             const categories = this.products.map((product) => ({
                 pc_no: product.pc_no,
@@ -131,10 +133,9 @@ export default {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
                 const data = await response.json()
-                // 驗證並清理數據
                 this.products = data.data.list.map(product => ({
                     ...product,
-                    p_no: product.p_no ? String(product.p_no) : ''  // 確保 p_no 是字符串
+                    p_no: product.p_no ? String(product.p_no) : ''
                 }))
             } catch (error) {
                 console.error('獲取商品列表時發生錯誤:', error)
@@ -164,13 +165,15 @@ export default {
                 p_fee: 0,
                 p_unit: '',
                 p_info: '',
-                p_img: ['', '', '', '']
+                p_img: ['', '', '', ''],
+                p_popular: '1'
             }
         },
         async editProduct(product) {
             this.currentProduct = {
                 ...product,
-                p_img: product.p_img.length ? product.p_img : ['', '', '', '']
+                p_img: product.p_img.length ? product.p_img : ['', '', '', ''],
+                p_popular: product.p_popular || '1'
             }
             this.modalTitle = '編輯商品'
             this.modalAction = '更新'
