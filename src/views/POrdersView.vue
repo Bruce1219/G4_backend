@@ -150,11 +150,11 @@ export default {
 
         cancelOrder() {
     if (this.selectedOrder.po_status !== 0 && this.selectedOrder.po_status !== 3) {
-        alert('只有待配送或待审核的订单可以注销。');
+        alert('只有待配送或待審核的訂單才可以註銷。');
         return;
     }
     
-    if (confirm('确定要注销此订单吗？')) {
+    if (confirm('確定要註銷訂單嗎？')) {
         console.log('Cancelling order:', this.selectedOrder.po_no);
         fetch('http://localhost/php_g4/back_productOrders.php', {
             method: 'POST',
@@ -171,12 +171,12 @@ export default {
                     this.closeLightbox();
                     this.fetchOrders();
                 } else {
-                    throw new Error('注销订单失败: ' + json.msg);
+                    throw new Error('註銷訂單錯誤: ' + json.msg);
                 }
             })
             .catch((error) => {
                 console.error('Error cancelling order:', error);
-                alert('注销订单时发生错误: ' + error.message);
+                alert('註銷訂單發生錯誤: ' + error.message);
             });
     }
 },
