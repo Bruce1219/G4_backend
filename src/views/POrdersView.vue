@@ -17,27 +17,69 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="user in p_orders" :key="user.po_no">
-                        <td>{{ user.po_no }}</td>
-                        <td>{{ user.m_no }}</td>
-                        <td>{{ user.po_name }}</td>
-                        <td>{{ user.po_time }}</td>
-                        <td>NT$ {{ user.po_total }}</td>
+                    <tr v-for="order in p_orders" :key="order.po_no">
+                        <td>{{ order.po_no }}</td>
+                        <td>{{ order.m_no }}</td>
+                        <td>{{ order.po_name }}</td>
+                        <td>{{ order.po_time }}</td>
+                        <td>NT$ {{ order.po_total }}</td>
                         <td>
-                            <select name="" id="">
-                                <option value="">完成</option>
-                                <option value="">已出貨</option>
-                                <option value="">備貨中</option>
-                                <option value="">審核中</option>
-                                <option value="">已取消</option>
+                            <select v-model="order.po_status" @change="updateOrderStatus(order)">
+                                <option value="0">待配送</option>
+                                <option value="1">配送中</option>
+                                <option value="2">配送完成</option>
+                                <option value="3">待審核</option>
+                                <option value="4">已註銷</option>
                             </select>
                         </td>
                         <td>
-                            <button class="edit">查看</button>
+                            <button class="edit" @click="viewOrder(order.po_no)">查看</button>
                         </td>
                     </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- Lightbox -->
+        <div v-if="showLightbox" class="lightbox-overlay">
+            <div class="lightbox-content">
+                <h2>訂單詳情</h2>
+                <p><strong>訂單編號:</strong> {{ selectedOrder.po_no }}</p>
+                <p><strong>會員姓名:</strong> {{ selectedOrder.po_name }}</p>
+                <p><strong>訂單日期:</strong> {{ selectedOrder.po_time }}</p>
+                <p><strong>訂單狀態:</strong> {{ getStatusText(selectedOrder.po_status) }}</p>
+
+                <h3>訂單商品</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>商品編號</th>
+                            <th>名稱</th>
+                            <th>數量</th>
+                            <th>單價</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="item in selectedOrder.items" :key="item.p_no">
+                            <td>{{ item.p_no }}</td>
+                            <td>{{ item.p_name }}</td>
+                            <td>{{ item.o_quatity }}</td>
+                            <td>NT$ {{ item.p_fee }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>訂單金額明細</h3>
+                <p><strong>總價:</strong> NT$ {{ selectedOrder.po_total }}</p>
+                <p><strong>折價券折抵:</strong> NT$ {{ selectedOrder.po_discount }}</p>
+                <p><strong>運費:</strong> NT$ 60</p>
+                <p><strong>實付金額:</strong> NT$ {{ selectedOrder.po_finalprice }}</p>
+
+                <div class="button-group">
+                    <button v-if="selectedOrder.po_status == 0" @click="cancelOrder" class="cancel-button">註銷訂單</button>
+                    <button @click="closeLightbox" class="close-button">關閉</button>
+                </div>
+            </div>
         </div>
     </section>
 </template>
@@ -46,55 +88,148 @@
 export default {
     data() {
         return {
-            p_orders: [
-                {
-                    po_no: 'A001',
-                    m_no: '001',
-                    po_name: '張員瑛',
-                    po_time: '2024/06/11',
-                    po_total: 500,
-                    status: '正常'
+            p_orders: [],
+            showLightbox: false,
+            selectedOrder: null,
+        };
+    },
+    methods: {
+        fetchOrders() {
+            console.log('Fetching orders...');
+            fetch('http://localhost/php_g4/back_productOrders.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                {
-                    po_no: 'A002',
-                    m_no: '002',
-                    po_name: '金采源',
-                    po_time: '2024/06/09',
-                    po_total: 500,
+                body: JSON.stringify({ action: 'fetch_orders' })
+            })
+                .then((res) => {
+                    console.log('Response received:', res);
+                    return res.json();
+                })
+                .then((json) => {
+                    console.log('Parsed JSON:', json);
+                    if (json.code == 200) {
+                        this.p_orders = json.data;
+                        console.log('Orders fetched:', this.p_orders);
+                    } else {
+                        throw new Error('獲取訂單失敗: ' + json.msg);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error fetching orders:', error);
+                    alert('獲取訂單時發生錯誤: ' + error.message);
+                });
+        },
 
-                    status: '正常'
+        viewOrder(po_no) {
+            console.log('Viewing order:', po_no);
+            fetch('http://localhost/php_g4/back_productOrders.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                 },
-                {
-                    po_no: 'A003',
-                    m_no: '003',
-                    po_name: '安兪真',
-                    po_time: '2024/06/03',
-                    po_total: 500,
+                body: JSON.stringify({ action: 'view_order', po_no: po_no })
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    console.log('Parsed JSON:', json);
+                    if (json.code === 200) {
+                        this.selectedOrder = json.data;
+                        this.showLightbox = true;
+                        console.log('Lightbox should show now. showLightbox:', this.showLightbox);
+                    } else {
+                        throw new Error('獲取訂單詳情失敗: ' + json.msg);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error viewing order:', error);
+                    alert('獲取訂單詳情時發生錯誤: ' + error.message);
+                });
+        },
 
-                    status: '停用'
-                },
-                {
-                    po_no: 'A004',
-                    m_no: '004',
-                    po_name: 'Sakura',
-                    po_time: '2024/06/02',
-                    po_total: 500,
-
-                    status: '正常'
-                },
-                {
-                    po_no: 'A005',
-                    m_no: '005',
-                    po_name: 'Karina',
-                    po_time: '2024/06/01',
-                    po_total: 500,
-
-                    status: '停用'
+        cancelOrder() {
+    if (this.selectedOrder.po_status !== 0 && this.selectedOrder.po_status !== 3) {
+        alert('只有待配送或待审核的订单可以注销。');
+        return;
+    }
+    
+    if (confirm('确定要注销此订单吗？')) {
+        console.log('Cancelling order:', this.selectedOrder.po_no);
+        fetch('http://localhost/php_g4/back_productOrders.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ action: 'cancel_order', po_no: this.selectedOrder.po_no })
+        })
+            .then((res) => res.json())
+            .then((json) => {
+                if (json.code === 200) {
+                    alert(json.msg);
+                    this.selectedOrder.po_status = 4; // 更新状态为已注销
+                    this.closeLightbox();
+                    this.fetchOrders();
+                } else {
+                    throw new Error('注销订单失败: ' + json.msg);
                 }
-            ]
+            })
+            .catch((error) => {
+                console.error('Error cancelling order:', error);
+                alert('注销订单时发生错误: ' + error.message);
+            });
+    }
+},
+        closeLightbox() {
+            this.showLightbox = false;
+            this.selectedOrder = null;
+        },
+
+        updateOrderStatus(order) {
+            console.log('Updating order status:', order.po_no, order.po_status);
+            fetch('http://localhost/php_g4/back_productOrders.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    action: 'update_order_status',
+                    po_no: order.po_no,
+                    po_status: order.po_status
+                })
+            })
+                .then((res) => {
+                    console.log('Response received:', res);
+                    return res.json();
+                })
+                .then((json) => {
+                    console.log('Parsed JSON:', json);
+                    if (json.code === 200) {
+                        alert('訂單狀態更新成功');
+                    } else {
+                        throw new Error('更新訂單狀態失敗: ' + json.msg);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error updating order status:', error);
+                    alert('更新訂單狀態時發生錯誤: ' + error.message);
+                });
+        },
+
+        getStatusText(status) {
+            const statusMap = {
+                0: '待配送',
+                1: '配送中',
+                2: '配送完成',
+                3: '待審核',
+                4:'已註銷'    
+            };
+            return statusMap[status] || '未知狀態';
         }
     },
-    methods: {}
+    mounted() {
+        this.fetchOrders();
+    }
 }
 </script>
 
@@ -109,18 +244,22 @@ export default {
     display: flex;
     flex-direction: row-reverse;
     justify-content: flex-start;
+
     .container {
         width: 80%;
         padding: 30px;
         margin: 0;
+
         div {
             display: flex;
             justify-content: space-between;
+
             h1 {
                 font-size: 2.25em;
                 font-family: $titleFont;
                 font-weight: bold;
             }
+
             button {
                 color: #fff;
                 text-decoration: none;
@@ -131,6 +270,7 @@ export default {
                 border-radius: 10px;
                 transition: 0.5s;
                 box-sizing: border-box;
+
                 &:hover {
                     background-color: #fff;
                     border: solid 1px $darkGreen;
@@ -142,10 +282,10 @@ export default {
         table {
             width: 100%;
             margin-top: 30px;
-            // border: solid 1px $darkGreen;
             background-color: #fff;
             border-collapse: separate;
             border-spacing: 0;
+
             thead {
                 line-height: 3;
                 text-align: center;
@@ -153,16 +293,19 @@ export default {
                 border-collapse: separate;
                 border-radius: 20px;
             }
+
             tr {
                 border-collapse: separate;
                 border-radius: 20px;
             }
+
             th {
                 color: #144433;
                 font-size: 16px;
                 padding: 10px;
                 border: solid 1px $darkGreen;
             }
+
             td {
                 font-size: 16px;
                 margin: 0 3px;
@@ -170,27 +313,28 @@ export default {
                 text-align: center;
                 border: solid 1px $darkGreen;
             }
-            /*第一欄第一列：左上*/
+
             tr:first-child th:first-child {
                 border-top-left-radius: 20px;
             }
-            /*第一欄最後列：左下*/
+
             tr:last-child td:first-child {
                 border-bottom-left-radius: 20px;
             }
-            /*最後欄第一列：右上*/
+
             tr:first-child th:last-child {
                 border-top-right-radius: 20px;
             }
-            /*最後欄第一列：右下*/
+
             tr:last-child td:last-child {
                 border-bottom-right-radius: 20px;
             }
+
             td:last-child {
                 line-height: 1;
             }
+
             .edit {
-                // width: 20px;
                 color: #fff;
                 text-decoration: none;
                 background-color: $darkGreen;
@@ -199,11 +343,143 @@ export default {
                 margin: 5px 0;
                 border-radius: 20px;
                 transition: 0.5s;
+
                 &:hover {
                     background-color: $red;
                 }
             }
         }
+    }
+}
+
+.lightbox-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000000;
+}
+
+.lightbox-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 80%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000001;
+
+    h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+    }
+
+    h3 {
+        font-size: 20px;
+        color: #444;
+        margin-top: 20px;
+        margin-bottom: 15px;
+    }
+
+    p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+
+        strong {
+            color: #555;
+        }
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 20px;
+    }
+
+    .cancel-button,
+    .close-button {
+        padding: 10px 20px;
+        margin-left: 15px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s, transform 0.1s;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+
+        &:active {
+            transform: translateY(1px);
+        }
+    }
+
+    .cancel-button {
+        background-color: #ff4d4d;
+        color: white;
+
+        &:hover {
+            background-color: #ff3333;
+        }
+    }
+
+    .close-button {
+        background-color: #4CAF50;
+        color: white;
+
+        &:hover {
+            background-color: #45a049;
+        }
+    }
+
+    &::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 5px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background: #555;
     }
 }
 </style>
