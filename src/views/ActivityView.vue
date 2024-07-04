@@ -69,8 +69,8 @@
                     </select>
                 </div>
                 <div>
-                    <span>新增圖片 : </span>
-                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" />
+                    <span>新增圖片 : </span> 
+                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" @change="getfile"/>
                 </div>
                 <div>
                     <span>活動名稱 : </span>
@@ -191,7 +191,8 @@ export default {
             a_rules1: '',
             a_rules2: '',
             a_rules3: '',
-            a_status: ''
+            a_status: '',
+            file:null,
         }
     },
     methods: {
@@ -252,7 +253,7 @@ export default {
                 a_rules1: this.a_rules1,
                 a_rules2: this.a_rules2,
                 a_rules3: this.a_rules3,
-                a_status: this.a_status
+                a_status: this.a_status,
             }
             fetch(url, {
                 method: 'POST',
@@ -287,6 +288,10 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
+        },
+        getfile(event) {
+            this.file = event.target.files[0];
+            console.log(this.file)
         },
         editEvent(event,index) {
             event.stopPropagation()

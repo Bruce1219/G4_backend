@@ -76,7 +76,13 @@
                 <p><strong>實付金額:</strong> NT$ {{ selectedOrder.po_finalprice }}</p>
 
                 <div class="button-group">
-                    <button v-if="selectedOrder.po_status == 0" @click="cancelOrder" class="cancel-button">註銷訂單</button>
+                    <button
+                        v-if="selectedOrder.po_status == 0"
+                        @click="cancelOrder"
+                        class="cancel-button"
+                    >
+                        註銷訂單
+                    </button>
                     <button @click="closeLightbox" class="close-button">關閉</button>
                 </div>
             </div>
@@ -90,107 +96,110 @@ export default {
         return {
             p_orders: [],
             showLightbox: false,
-            selectedOrder: null,
-        };
+            selectedOrder: null
+        }
     },
     methods: {
         fetchOrders() {
-            console.log('Fetching orders...');
+            console.log('Fetching orders...')
             fetch('http://localhost/php_g4/back_productOrders.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ action: 'fetch_orders' })
             })
                 .then((res) => {
-                    console.log('Response received:', res);
-                    return res.json();
+                    console.log('Response received:', res)
+                    return res.json()
                 })
                 .then((json) => {
-                    console.log('Parsed JSON:', json);
+                    console.log('Parsed JSON:', json)
                     if (json.code == 200) {
-                        this.p_orders = json.data;
-                        console.log('Orders fetched:', this.p_orders);
+                        this.p_orders = json.data
+                        console.log('Orders fetched:', this.p_orders)
                     } else {
-                        throw new Error('獲取訂單失敗: ' + json.msg);
+                        throw new Error('獲取訂單失敗: ' + json.msg)
                     }
                 })
                 .catch((error) => {
-                    console.error('Error fetching orders:', error);
-                    alert('獲取訂單時發生錯誤: ' + error.message);
-                });
+                    console.error('Error fetching orders:', error)
+                    alert('獲取訂單時發生錯誤: ' + error.message)
+                })
         },
 
         viewOrder(po_no) {
-            console.log('Viewing order:', po_no);
+            console.log('Viewing order:', po_no)
             fetch('http://localhost/php_g4/back_productOrders.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({ action: 'view_order', po_no: po_no })
             })
                 .then((res) => res.json())
                 .then((json) => {
-                    console.log('Parsed JSON:', json);
+                    console.log('Parsed JSON:', json)
                     if (json.code === 200) {
-                        this.selectedOrder = json.data;
-                        this.showLightbox = true;
-                        console.log('Lightbox should show now. showLightbox:', this.showLightbox);
+                        this.selectedOrder = json.data
+                        this.showLightbox = true
+                        console.log('Lightbox should show now. showLightbox:', this.showLightbox)
                     } else {
-                        throw new Error('獲取訂單詳情失敗: ' + json.msg);
+                        throw new Error('獲取訂單詳情失敗: ' + json.msg)
                     }
                 })
                 .catch((error) => {
-                    console.error('Error viewing order:', error);
-                    alert('獲取訂單詳情時發生錯誤: ' + error.message);
-                });
+                    console.error('Error viewing order:', error)
+                    alert('獲取訂單詳情時發生錯誤: ' + error.message)
+                })
         },
 
         cancelOrder() {
-    if (this.selectedOrder.po_status !== 0 && this.selectedOrder.po_status !== 3) {
-        alert('只有待配送或待審核的訂單才可以註銷。');
-        return;
-    }
-    
-    if (confirm('確定要註銷訂單嗎？')) {
-        console.log('Cancelling order:', this.selectedOrder.po_no);
-        fetch('http://localhost/php_g4/back_productOrders.php', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ action: 'cancel_order', po_no: this.selectedOrder.po_no })
-        })
-            .then((res) => res.json())
-            .then((json) => {
-                if (json.code === 200) {
-                    alert(json.msg);
-                    this.selectedOrder.po_status = 4; // 更新状态为已注销
-                    this.closeLightbox();
-                    this.fetchOrders();
-                } else {
-                    throw new Error('註銷訂單錯誤: ' + json.msg);
-                }
-            })
-            .catch((error) => {
-                console.error('Error cancelling order:', error);
-                alert('註銷訂單發生錯誤: ' + error.message);
-            });
-    }
-},
+            if (this.selectedOrder.po_status != 0 && this.selectedOrder.po_status != 3) {
+                alert('只有待配送或待審核的訂單才可以註銷。')
+                return
+            }
+
+            if (confirm('確定要註銷訂單嗎？')) {
+                console.log('Cancelling order:', this.selectedOrder.po_no)
+                fetch('http://localhost/php_g4/back_productOrders.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'cancel_order',
+                        po_no: this.selectedOrder.po_no
+                    })
+                })
+                    .then((res) => res.json())
+                    .then((json) => {
+                        if (json.code === 200) {
+                            alert(json.msg)
+                            this.selectedOrder.po_status = 4 // 更新状态为已注销
+                            this.closeLightbox()
+                            this.fetchOrders()
+                        } else {
+                            throw new Error('註銷訂單錯誤: ' + json.msg)
+                        }
+                    })
+                    .catch((error) => {
+                        console.error('Error cancelling order:', error)
+                        alert('註銷訂單發生錯誤: ' + error.message)
+                    })
+            }
+        },
         closeLightbox() {
-            this.showLightbox = false;
-            this.selectedOrder = null;
+            this.showLightbox = false
+            this.selectedOrder = null
         },
 
         updateOrderStatus(order) {
-            console.log('Updating order status:', order.po_no, order.po_status);
+            console.log('Updating order status:', order.po_no, order.po_status)
             fetch('http://localhost/php_g4/back_productOrders.php', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     action: 'update_order_status',
@@ -199,21 +208,21 @@ export default {
                 })
             })
                 .then((res) => {
-                    console.log('Response received:', res);
-                    return res.json();
+                    console.log('Response received:', res)
+                    return res.json()
                 })
                 .then((json) => {
-                    console.log('Parsed JSON:', json);
+                    console.log('Parsed JSON:', json)
                     if (json.code === 200) {
-                        alert('訂單狀態更新成功');
+                        alert('訂單狀態更新成功')
                     } else {
-                        throw new Error('更新訂單狀態失敗: ' + json.msg);
+                        throw new Error('更新訂單狀態失敗: ' + json.msg)
                     }
                 })
                 .catch((error) => {
-                    console.error('Error updating order status:', error);
-                    alert('更新訂單狀態時發生錯誤: ' + error.message);
-                });
+                    console.error('Error updating order status:', error)
+                    alert('更新訂單狀態時發生錯誤: ' + error.message)
+                })
         },
 
         getStatusText(status) {
@@ -222,13 +231,13 @@ export default {
                 1: '配送中',
                 2: '配送完成',
                 3: '待審核',
-                4:'已註銷'    
-            };
-            return statusMap[status] || '未知狀態';
+                4: '已註銷'
+            }
+            return statusMap[status] || '未知狀態'
         }
     },
     mounted() {
-        this.fetchOrders();
+        this.fetchOrders()
     }
 }
 </script>
@@ -436,7 +445,9 @@ export default {
         border-radius: 5px;
         cursor: pointer;
         font-size: 16px;
-        transition: background-color 0.3s, transform 0.1s;
+        transition:
+            background-color 0.3s,
+            transform 0.1s;
 
         &:hover {
             transform: translateY(-2px);
@@ -457,7 +468,7 @@ export default {
     }
 
     .close-button {
-        background-color: #4CAF50;
+        background-color: #4caf50;
         color: white;
 
         &:hover {
