@@ -25,7 +25,7 @@
                             <td>{{ farm.f_loc }}</td>
                             <td>{{ farm.f_farmer }}</td>
                             <td>{{ farm.f_intro }}</td>
-                            <td>{{ farm.f_status === '1' ? '上架' : '下架' }}</td>
+                            <td>{{ farm.f_status == '1' ? '上架' : '下架' }}</td>
                             <td>
                                 <button @click="editFarm(farm)" class="edit">編輯</button>
                                 <button @click="deleteFarm(farm.f_no)" class="delete">刪除</button>
