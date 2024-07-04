@@ -22,7 +22,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="item in activity" :key="item.a_no">
+                        <tr v-for="(item, index) in activities" :key="item.a_no">
                             <td>{{ item.a_no }}</td>
                             <td>
                                 <div class="pic">
@@ -34,15 +34,14 @@
                             <td>{{ item.a_max }}人</td>
                             <td>{{ item.a_attendee }}人</td>
                             <td>NT$ {{ item.a_fee }}</td>
-                            <td>{{ item.a_date }}</td>
+                            <td>{{ item.a_start_date }}</td>
+                            <td v-show = "item.a_status ==1">上架</td>
+                            <td v-show = "item.a_status == 0">下架</td>
                             <td>
-                                <select name="" id="">
-                                    <option value="">上架</option>
-                                    <option value="">下架</option>
-                                </select>
-                            </td>
-                            <td>
-                                <button class="edit">編輯</button>
+                                <button class="edit" @click="editEvent($event, index)">編輯</button>
+                                <button class="edit delete" @click="deleteEvent($event,index)">
+                                    刪除
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -50,42 +49,117 @@
             </div>
         </div>
     </section>
-    <div class="section-addActivity" v-show="addSwitch" @click="addActivity($event)">
+    <div
+        class="section-addActivity"
+        v-show="addSwitch === true || editSwitch === true"
+    >
         <div class="addActivity" @click.stop>
-            <h2>新增活動</h2>
+            <h2 v-show="addSwitch">新增活動</h2>
+            <h2 v-show="editSwitch">修改活動</h2>
             <form action="#">
                 <div>
-                    <span>管理員密碼 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員密碼"
-                        v-model="am_password"
-                    />
+                    <span>活動編號 : </span>
+                    <input type="number" name="a_no" v-model="a_no" disabled/>
                 </div>
                 <div>
-                    <span>管理員等級 : </span>
-                    <select v-model="am_level">
-                        <option value="" disabled selected>請選擇管理員等級</option>
-                        <option value="1">超級管理員</option>
-                        <option value="2">一般管理員</option>
+                    <span>活動類別 : </span>
+                    <select name="c_no" id="" v-model="c_no">
+                        <option value="市集">市集</option>
+                        <option value="講座">講座</option>
                     </select>
                 </div>
                 <div>
-                    <span>管理員狀態 : </span>
-                    <select v-model="am_status">
-                        <option value="" disabled selected>請選擇管理員狀態</option>
-                        <option value="1">正常</option>
-                        <option value="0">停權</option>
+                    <span>新增圖片 : </span>
+                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" />
+                </div>
+                <div>
+                    <span>活動名稱 : </span>
+                    <input type="text" name="a_name" placeholder="輸入活動名稱" v-model="a_name" />
+                </div>
+                <div>
+                    <span>活動地址 : </span>
+                    <input type="text" name="a_loc" placeholder="活動地址" v-model="a_loc" />
+                </div>
+                <div>
+                    <span>報名上限 : </span>
+                    <input type="number" name="a_max" v-model="a_max" />
+                </div>
+                <div>
+                    <span>活動費用 : </span>
+                    <input type="number" name="a_fee" v-model="a_fee" />
+                </div>
+                <div>
+                    <span>活動日期: </span>
+                    <input type="datetime-local" name="a_time" v-model="a_time" />
+                </div>
+                <div>
+                    <span>活動區間: </span>
+                    <input type="date" name="a_start_date" v-model="a_start_date" />
+                    <input type="date" name="a_end_date" v-model="a_end_date" />
+                </div>
+                <div>
+                    <span>講師: </span>
+                    <input type="text" name="a_teacher" v-model="a_teacher" />
+                </div>
+                <div>
+                    <span>報名區間: </span>
+                    <input type="date" name="a_signups" v-model="a_signups" />
+                    <input type="date" name="a_signupe" v-model="a_signupe" />
+                </div>
+                <div>
+                    <span>活動資訊: </span>
+                    <textarea name="a_info" v-model="a_info"></textarea>
+                </div>
+                <div>
+                    <span>活動資訊1: </span>
+                    <textarea name="a_info1" v-model="a_info1"></textarea>
+                </div>
+                <div>
+                    <span>活動資訊2: </span>
+                    <textarea name="a_info2" v-model="a_info2"></textarea>
+                </div>
+                <div>
+                    <span>活動資訊3: </span>
+                    <textarea name="a_info3" v-model="a_info3"></textarea>
+                </div>
+                <div>
+                    <span>活動須知1: </span>
+                    <textarea name="a_rules1" v-model="a_rules1"></textarea>
+                </div>
+                <div>
+                    <span>活動須知2: </span>
+                    <textarea name="a_rules2" v-model="a_rules2"></textarea>
+                </div>
+                <div>
+                    <span>活動須知3: </span>
+                    <textarea name="a_rules3" v-model="a_rules3"></textarea>
+                </div>
+                <div>
+                    <span>活動狀態:</span>
+                    <select name="a_status" v-model="a_status">
+                        <option value="1">上架</option>
+                        <option value="0">下架</option>
                     </select>
                 </div>
-                <div class="button">
+                <div class="button" v-show="addSwitch">
                     <button type="button" class="cancel" @click="addActivity($event)">取消</button>
                     <button type="button" class="confirm" @click="confirm()">儲存</button>
                 </div>
+                <div class="button" v-show="editSwitch">
+                    <button type="button" class="cancel" @click="editEvent($event)">取消</button>
+                    <button type="button" class="confirm" @click="editConfirm()">儲存</button>
+                </div>
             </form>
         </div>
+    </div>
+    <div class="section-addActivity" v-show="deleteSwitch === true" @click="deleteEvent($event)"  >
+        <div class="delete-alert addActivity"  @click.stop>
+            <h2>確定要刪除?</h2>
+            <div class="button">
+            <button type="button" class=" cancel" @click="deleteEvent($event)">取消</button>
+            <button class=" delete confirm" @click="deleteConfirm()">刪除</button>
+        </div>
+    </div>
     </div>
 </template>
 
@@ -94,60 +168,30 @@ export default {
     data() {
         return {
             addSwitch: false,
-            activity: [
-                {
-                    a_no: 'A001',
-                    p_img: 'act1.png',
-                    a_date: '2024-06-04',
-                    a_name: '有機農業的未來',
-                    c_no: '講座',
-                    a_max: 999,
-                    a_attendee: 0,
-                    a_fee: 500,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    a_no: 'A002',
-                    p_img: 'act2.png',
-                    a_date: '2024-06-01',
-                    a_name: '小農市集',
-                    c_no: '市集',
-                    a_max: 50,
-                    a_attendee: 0,
-                    a_fee: 0,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    a_no: 'A002',
-                    p_img: 'act2.png',
-                    a_date: '2024-06-01',
-                    a_name: '小農市集',
-                    c_no: '市集',
-                    a_max: 50,
-                    a_attendee: 0,
-                    a_fee: 0,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    a_no: 'A002',
-                    p_img: 'act2.png',
-                    a_date: '2024-06-01',
-                    a_name: '小農市集',
-                    c_no: '市集',
-                    a_max: 50,
-                    a_attendee: 0,
-                    a_fee: 0,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                }
-            ]
+            editSwitch: false,
+            deleteSwitch: false,
+            activities: [],
+            a_no: '',
+            c_no: '',
+            a_img: null,
+            a_name: '',
+            a_loc: '',
+            a_max: '',
+            a_fee: '',
+            a_time: '',
+            a_start_date: '',
+            a_end_date: '',
+            a_teacher: '',
+            a_signups: '',
+            a_signupe: '',
+            a_info: '',
+            a_info1: '',
+            a_info2: '',
+            a_info3: '',
+            a_rules1: '',
+            a_rules2: '',
+            a_rules3: '',
+            a_status: ''
         }
     },
     methods: {
@@ -156,14 +200,258 @@ export default {
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
+            //新增情況
             if (this.addSwitch === false) {
-                this.addSwitch = true
-                console.log(this.addSwitch)
+                this.addSwitch = true;
+                this.a_no = this.activities.length+1
             } else {
                 this.addSwitch = false
-                ;(this.am_password = ''), (this.am_level = ''), (this.am_status = '')
+                this.a_no = this.activities.length+1
+                this.c_no = ''
+                this.a_img = null
+                this.a_name = ''
+                this.a_loc = ''
+                this.a_max = ''
+                this.a_fee = ''
+                this.a_time = ''
+                this.a_start_date = ''
+                this.a_end_date = ''
+                this.a_teacher = ''
+                this.a_signups = ''
+                this.a_signupe = ''
+                this.a_info = ''
+                this.a_info1 = ''
+                this.a_info2 = ''
+                this.a_info3 = ''
+                this.a_rules1 = ''
+                this.a_rules2 = ''
+                this.a_rules3 = ''
+                this.a_status = ''
             }
+        },
+        confirm() {
+            const url = `http://localhost/php_G4/addEvents.php`
+            let body = {
+                a_no: this.a_no,
+                c_no: this.c_no,
+                a_img: this.a_img,
+                a_name: this.a_name,
+                a_loc: this.a_loc,
+                a_max: this.a_max,
+                a_fee: this.a_fee,
+                a_time: this.a_time,
+                a_start_date: this.a_start_date,
+                a_end_date: this.a_end_date,
+                a_teacher: this.a_teacher,
+                a_signups: this.a_signups,
+                a_signupe: this.a_signupe,
+                a_info: this.a_info,
+                a_info1: this.a_info1,
+                a_info2: this.a_info2,
+                a_info3: this.a_info3,
+                a_rules1: this.a_rules1,
+                a_rules2: this.a_rules2,
+                a_rules3: this.a_rules3,
+                a_status: this.a_status
+            }
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    this.data = json
+                    console.log(this.data)
+                    if (
+                        this.data != null ||
+                        this.a_no != null ||
+                        this.c_no != null ||
+                        this.a_name != null ||
+                        this.a_loc != null ||
+                        this.a_max != null ||
+                        this.a_fee != null ||
+                        this.this.a_time ||
+                        this.a_start_date != null ||
+                        this.a_end_date != null ||
+                        this.a_signups != null ||
+                        this.this.a_signupe != null ||
+                        this.a_status != null
+                    ) {
+                        alert('新增成功!')
+                        this.addSwitch = false
+                        this.fetchDate()
+                    } else {
+                        alert(this.data.msg)
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error)
+                })
+        },
+        editEvent(event,index) {
+            event.stopPropagation()
+            if (this.editSwitch === false) {
+                this.editSwitch = true
+                //編輯把值帶入input裡面
+                this.a_no = this.activities[index].a_no
+                this.c_no = this.activities[index].c_no
+                this.a_name = this.activities[index].a_name
+                this.a_loc = this.activities[index].a_loc
+                this.a_max = this.activities[index].a_max
+                this.a_fee = this.activities[index].a_fee
+                this.a_time = this.activities[index].a_time
+                this.a_start_date = this.activities[index].a_start_date
+                this.a_end_date = this.activities[index].a_end_date
+                this.a_teacher = this.activities[index].a_teacher
+                this.a_signups = this.activities[index].a_signups
+                this.a_signupe = this.activities[index].a_signupe
+                this.a_info = this.activities[index].a_info
+                this.a_info1 = this.activities[index].a_info1
+                this.a_info2 = this.activities[index].a_info2
+                this.a_info3 = this.activities[index].a_info3
+                this.a_rules1 = this.activities[index].a_rules1
+                this.a_rules2 = this.activities[index].a_rules2
+                this.a_rules3 = this.activities[index].a_rules3
+                this.a_status = this.activities[index].a_status
+            } else {
+                //關閉時，重置
+                this.editSwitch = false
+                this.a_no = this.activities.length+1
+                this.c_no = ''
+                this.a_img = null
+                this.a_name = ''
+                this.a_loc = ''
+                this.a_max = ''
+                this.a_fee = ''
+                this.a_time = ''
+                this.a_start_date = ''
+                this.a_end_date = ''
+                this.a_teacher = ''
+                this.a_signups = ''
+                this.a_signupe = ''
+                this.a_info = ''
+                this.a_info1 = ''
+                this.a_info2 = ''
+                this.a_info3 = ''
+                this.a_rules1 = ''
+                this.a_rules2 = ''
+                this.a_rules3 = ''
+                this.a_status = ''
+            }
+        },
+        fetchDate() {
+            fetch(`http://localhost/php_G4/activitiesList.php`, {
+                method: 'POST'
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    console.log(json)
+                    this.activities = json['data']['list']
+                })
+        },
+        editConfirm() {
+            const url = `http://localhost/php_G4/editEvents.php`
+            let body = {
+                a_no: this.a_no,
+                c_no: this.c_no,
+                a_img: this.a_img,
+                a_name: this.a_name,
+                a_loc: this.a_loc,
+                a_max: this.a_max,
+                a_fee: this.a_fee,
+                a_time: this.a_time,
+                a_start_date: this.a_start_date,
+                a_end_date: this.a_end_date,
+                a_teacher: this.a_teacher,
+                a_signups: this.a_signups,
+                a_signupe: this.a_signupe,
+                a_info: this.a_info,
+                a_info1: this.a_info1,
+                a_info2: this.a_info2,
+                a_info3: this.a_info3,
+                a_rules1: this.a_rules1,
+                a_rules2: this.a_rules2,
+                a_rules3: this.a_rules3,
+                a_status: this.a_status
+            }
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    this.data = json
+                    console.log(this.data)
+                    if (
+                        this.data != null ||
+                        this.a_no != null ||
+                        this.c_no != null ||
+                        this.a_name != null ||
+                        this.a_loc != null ||
+                        this.a_max != null ||
+                        this.a_fee != null ||
+                        this.this.a_time ||
+                        this.a_start_date != null ||
+                        this.a_end_date != null ||
+                        this.a_signups != null ||
+                        this.this.a_signupe != null ||
+                        this.a_status != null
+                    ) {
+                        alert('編輯成功!')
+                        this.editSwitch = false
+                        this.fetchDate()
+                    } else {
+                        alert(this.data.msg)
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error)
+                })
+        },
+        deleteEvent(event,index) {
+            event.stopPropagation();
+            console.log(this.deleteSwitch)
+            if (this.deleteSwitch === false) {
+                this.deleteSwitch = true
+                //編輯把值帶入input裡面
+                this.a_no = this.activities[index].a_no
+            } else {
+                //關閉時，重置
+                this.deleteSwitch = false
+                this.a_no = ''
+            }
+        },
+        deleteConfirm () {
+            const url = `http://localhost/php_G4/deleteEvents.php`
+            let body = {
+                a_no: this.a_no,
+            }
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(body)
+            })
+                .then((res) => res.json())
+                .then((json) => {
+                    this.data = json
+                    console.log(this.data)
+                    if (
+                        this.data != null ||
+                        this.a_no != null 
+                    ) {
+                        alert('刪除成功!')
+                        this.deleteSwitch = false
+                        this.fetchDate()
+                    } else {
+                        alert(this.data.msg)
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error)
+                })
         }
+    },
+    mounted() {
+        this.fetchDate()
     }
 }
 </script>
@@ -211,6 +499,9 @@ export default {
         }
         .wrap-table {
             //有scrollbar
+            &::-webkit-scrollbar {
+                width: 1px;
+            }
             width: 100%;
             height: 75%;
             overflow: auto;
@@ -310,9 +601,12 @@ export default {
     z-index: 21;
     top: 0;
     .addActivity {
+        &::-webkit-scrollbar {
+            width: 1px;
+        }
         overflow: auto;
-        width: 50%;
-        height: 75%;
+        width: 80%;
+        height: 80%;
         background-color: $bcgw;
         border-radius: 20px;
         padding: 40px 0;
