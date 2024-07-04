@@ -1,12 +1,10 @@
 <template>
     <section class="section">
         <div class="container">
-            <!-- 頁面標題和新增按鈕 -->
             <div>
                 <h1>商品管理</h1>
                 <button @click="showAddModal">+ 新增商品</button>
             </div>
-            <!-- 商品列表表格 -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -21,7 +19,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 遍歷並顯示所有商品 -->
                         <tr v-for="product in sortedProducts" :key="product.p_no">
                             <td>{{ product.p_no }}</td>
                             <td>{{ product.p_name }}</td>
@@ -31,9 +28,7 @@
                             <td>{{ product.p_unit }}</td>
                             <td>
                                 <button @click="editProduct(product)" class="edit">編輯</button>
-                                <button @click="deleteProduct(product.p_no)" class="delete">
-                                    刪除
-                                </button>
+                                <button @click="deleteProduct(product.p_no)" class="delete">刪除</button>
                             </td>
                         </tr>
                     </tbody>
@@ -41,43 +36,24 @@
             </div>
         </div>
 
-        <!-- 新增/編輯商品的彈出視窗 -->
-        <div
-            class="modal"
-            v-if="showAddProductModal || showEditProductModal"
-            @click="closeModalIfBackgroundClicked"
-        >
+        <div class="modal" v-if="showAddProductModal || showEditProductModal" @click="closeModalIfBackgroundClicked">
             <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
                 <form @submit.prevent="saveProduct">
-                    <!-- 商品編號輸入 (只在編輯時顯示) -->
                     <label v-if="showEditProductModal" for="productNo">商品編號</label>
-                    <input
-                        v-if="showEditProductModal"
-                        type="text"
-                        id="productNo"
-                        v-model="currentProduct.p_no"
-                        readonly
-                    />
+                    <input v-if="showEditProductModal" type="text" id="productNo" v-model="currentProduct.p_no" readonly />
 
-                    <!-- 商品名稱輸入 -->
                     <label for="productName">商品名稱</label>
                     <input type="text" id="productName" v-model="currentProduct.p_name" required />
 
-                    <!-- 商品類別選擇 -->
                     <label for="productCategory">商品類別</label>
                     <select id="productCategory" v-model="currentProduct.pc_no" required>
-                        <option
-                            v-for="category in uniqueCategories"
-                            :key="category.pc_no"
-                            :value="category.pc_no"
-                        >
+                        <option v-for="category in uniqueCategories" :key="category.pc_no" :value="category.pc_no">
                             {{ category.pc_name }}
                         </option>
                     </select>
 
-                    <!-- 農場選擇 -->
                     <label for="productFarm">農場名稱</label>
                     <select id="productFarm" v-model="currentProduct.f_no" required>
                         <option v-for="farm in uniqueFarms" :key="farm.f_no" :value="farm.f_no">
@@ -85,46 +61,21 @@
                         </option>
                     </select>
 
-                    <!-- 商品價格輸入 -->
                     <label for="productFee">商品價格</label>
-                    <input
-                        type="number"
-                        id="productFee"
-                        v-model="currentProduct.p_fee"
-                        required
-                        min="0"
-                    />
+                    <input type="number" id="productFee" v-model="currentProduct.p_fee" required min="0" />
 
-                    <!-- 購買單位輸入 -->
                     <label for="productUnit">購買單位</label>
                     <input type="text" id="productUnit" v-model="currentProduct.p_unit" required />
 
-                    <!-- 商品描述輸入 -->
                     <label for="productDescription">商品描述</label>
-                    <textarea
-                        id="productDescription"
-                        v-model="currentProduct.p_info"
-                        required
-                    ></textarea>
+                    <textarea id="productDescription" v-model="currentProduct.p_info" required></textarea>
 
-                    <!-- 商品圖片輸入 -->
                     <div v-for="(image, index) in currentProduct.p_img" :key="index">
                         <label :for="'productImage' + (index + 1)">商品圖片 {{ index + 1 }}</label>
-                        <input
-                            type="text"
-                            :id="'productImageName' + (index + 1)"
-                            v-model="currentProduct.p_img[index]"
-                            :placeholder="'輸入圖片 ' + (index + 1) + ' 檔名'"
-                        />
-                        <input
-                            type="file"
-                            :id="'productImageFile' + (index + 1)"
-                            @change="handleImageUpload($event, index)"
-                            accept="image/*"
-                        />
+                        <input type="text" :id="'productImageName' + (index + 1)" v-model="currentProduct.p_img[index]" :placeholder="'輸入圖片 ' + (index + 1) + ' 檔名'" />
+                        <input type="file" :id="'productImageFile' + (index + 1)" @change="handleImageUpload($event, index)" accept="image/*" />
                     </div>
 
-                    <!-- 提交按鈕 -->
                     <button type="submit">{{ modalAction }}</button>
                 </form>
             </div>
@@ -137,6 +88,7 @@ export default {
     data() {
         return {
             products: [],
+            farms: [],
             showAddProductModal: false,
             showEditProductModal: false,
             modalTitle: '',
@@ -160,11 +112,7 @@ export default {
             return Array.from(new Map(categories.map((item) => [item.pc_no, item])).values())
         },
         uniqueFarms() {
-            const farms = this.products.map((product) => ({
-                f_no: product.f_no,
-                f_name: product.f_name
-            }))
-            return Array.from(new Map(farms.map((item) => [item.f_no, item])).values())
+            return this.farms
         }
     },
     methods: {
@@ -181,6 +129,20 @@ export default {
                 alert('獲取商品列表失敗,請稍後再試。')
             }
         },
+        async fetchFarms() {
+            try {
+                const response = await fetch('http://localhost/php_g4/farm.php')
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data = await response.json()
+                return data.data.list
+            } catch (error) {
+                console.error('獲取農場列表時發生錯誤:', error)
+                alert('獲取農場列表失敗，請稍後再試。')
+                return []
+            }
+        },
         getEmptyProduct() {
             return {
                 p_no: '',
@@ -193,7 +155,7 @@ export default {
                 p_img: ['', '', '', '']
             }
         },
-        editProduct(product) {
+        async editProduct(product) {
             this.currentProduct = {
                 ...product,
                 p_img: product.p_img.length ? product.p_img : ['', '', '', '']
@@ -201,16 +163,17 @@ export default {
             this.modalTitle = '編輯商品'
             this.modalAction = '更新'
             this.showEditProductModal = true
+            this.farms = await this.fetchFarms()
         },
-        showAddModal() {
+        async showAddModal() {
             this.currentProduct = this.getEmptyProduct()
             this.modalTitle = '新增商品'
             this.modalAction = '新增'
             this.showAddProductModal = true
+            this.farms = await this.fetchFarms()
         },
         async saveProduct() {
             try {
-                // 过滤掉空的图片名称
                 this.currentProduct.p_img = this.currentProduct.p_img.filter(
                     (img) => img.trim() !== ''
                 )
@@ -274,20 +237,13 @@ export default {
         handleImageUpload(event, index) {
             const file = event.target.files[0]
             if (file) {
-                // 这里设置文件名到对应的输入框
                 this.currentProduct.p_img[index] = file.name
-
-                // 注意：这里我们只是设置了文件名
-                // 实际的文件上传逻辑需要单独实现
-                // 例如，您可能需要使用 FormData 将文件发送到服务器
-                // const formData = new FormData();
-                // formData.append('image', file);
-                // 然后使用 fetch 或 axios 发送 formData 到服务器
             }
         }
     },
-    mounted() {
-        this.fetchProducts()
+    async mounted() {
+        await this.fetchProducts()
+        this.farms = await this.fetchFarms()
     }
 }
 </script>
