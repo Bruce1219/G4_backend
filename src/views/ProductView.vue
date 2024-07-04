@@ -99,10 +99,17 @@ export default {
     computed: {
         sortedProducts() {
             return [...this.products].sort((a, b) => {
-                const aNumber = parseInt(a.p_no.replace(/\D/g, ''))
-                const bNumber = parseInt(b.p_no.replace(/\D/g, ''))
-                return aNumber - bNumber
-            })
+                // 檢查 p_no 是否存在且為字符串
+                const aStr = typeof a.p_no === 'string' ? a.p_no : '';
+                const bStr = typeof b.p_no === 'string' ? b.p_no : '';
+
+                // 使用正則表達式提取數字，並轉換為整數
+                const aNumber = parseInt(aStr.replace(/\D/g, '') || '0', 10);
+                const bNumber = parseInt(bStr.replace(/\D/g, '') || '0', 10);
+
+                // 比較數字
+                return aNumber - bNumber;
+            });
         },
         
         uniqueCategories() {
@@ -124,7 +131,11 @@ export default {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
                 const data = await response.json()
-                this.products = data.data.list
+                // 驗證並清理數據
+                this.products = data.data.list.map(product => ({
+                    ...product,
+                    p_no: product.p_no ? String(product.p_no) : ''  // 確保 p_no 是字符串
+                }))
             } catch (error) {
                 console.error('獲取商品列表時發生錯誤:', error)
                 alert('獲取商品列表失敗,請稍後再試。')
