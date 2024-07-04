@@ -104,6 +104,7 @@ export default {
                 return aNumber - bNumber
             })
         },
+        
         uniqueCategories() {
             const categories = this.products.map((product) => ({
                 pc_no: product.pc_no,
