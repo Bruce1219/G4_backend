@@ -48,6 +48,7 @@
     </section>
     <div class="section-addAdmin" v-show="addSwitch" @click="addAdmin($event)">
         <div class="addAdmin" @click.stop>
+            <span class="close" @click="addAdmin($event)">&times;</span>
             <h2>新增管理員</h2>
             <form action="#">
                 <!-- <div>
@@ -97,7 +98,6 @@
                     </select>
                 </div>
                 <div class="button">
-                    <button type="button" class="cancel" @click="addAdmin($event)">取消</button>
                     <button type="button" class="confirm" @click="confirm()">儲存</button>
                 </div>
             </form>
@@ -203,7 +203,6 @@ export default {
                 am_level: this.am_level,
                 am_status: this.am_status
             }
-
             fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(body)
@@ -214,6 +213,10 @@ export default {
                     if (this.data.code === 200) {
                         alert('新增成功')
                         this.addSwitch = false
+                        this.am_password = ''
+                        this.am_level = ''
+                        this.am_status = ''
+                        // this.addAdmin()
                         this.fetchData() // 新增成功後重新獲取資料
                     } else {
                         alert(this.data.msg)
@@ -290,23 +293,28 @@ export default {
                     font-weight: bold;
                     border-collapse: separate;
                     border-radius: 20px;
+                    background-color: $darkGreen;
+                    color: #fff;
                 }
                 tr {
                     border-collapse: separate;
                     border-radius: 20px;
+                    &:nth-child(even) {
+                        background-color: #f8f8f8;
+                    }
                 }
                 th {
-                    color: #144433;
+                    color: #fff;
                     font-size: 16px;
                     padding: 10px;
-                    border: solid 1px $darkGreen;
+                    // border: solid 1px $darkGreen;
                 }
                 td {
                     font-size: 16px;
                     margin: 0 3px;
                     line-height: 3;
                     text-align: center;
-                    border: solid 1px $darkGreen;
+                    border-top: solid 1px #ddd;
                 }
                 /*第一欄第一列：左上*/
                 tr:first-child th:first-child {
@@ -370,7 +378,7 @@ export default {
         overflow: auto;
         width: 50%;
         height: 75%;
-        background-color: $bcgw;
+        background-color: #fff;
         border-radius: 20px;
         padding: 40px 0;
         display: flex;
@@ -381,28 +389,51 @@ export default {
         left: 50%;
         transform: translate(-50%, -50%);
         z-index: 10;
+        &::-webkit-scrollbar {
+            width: 1px;
+        }
+        .close {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 20px;
+            color: grey;
+            transition: 0.5s;
+            &:hover {
+                color: $red;
+            }
+        }
         h2 {
+            width: 80%;
             color: $darkGreen;
             font-size: 2.25rem;
             font-family: $titleFont;
             font-weight: bold;
+            padding-bottom: 10px;
+            // border-bottom: solid 1px grey;
         }
         form {
-            margin-top: 50px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             div {
                 width: 80%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
+                // display: flex;
+                // justify-content: space-between;
+                // align-items: center;
                 margin: 10px 0;
+                span {
+                    color: $darkGreen;
+                    font-weight: bold;
+                    display: block;
+                    margin-bottom: 10px;
+                }
                 input {
-                    width: 70%;
+                    width: 100%;
                     height: 35px;
-                    border: solid 1px $darkGreen;
+                    border: solid 1px grey;
+                    border-radius: 5px;
                     padding: 8px 15px;
                     outline: none;
                     &:focus {
@@ -413,9 +444,10 @@ export default {
                     }
                 }
                 select {
-                    width: 70%;
+                    width: 100%;
                     height: 35px;
-                    border: solid 1px $darkGreen;
+                    border: solid 1px grey;
+                    border-radius: 5px;
                     padding: 0 14px;
                     outline: none;
                     color: grey;
@@ -428,18 +460,21 @@ export default {
                 }
             }
             .button {
-                width: 35%;
-                margin-top: 50px;
+                width: 100%;
+                margin-top: 30px;
+                display: flex;
+                justify-content: center;
                 button {
+                    width: 80%;
                     display: inline-block;
                     text-decoration: none;
-                    border-radius: 25px;
+                    border-radius: 5px;
                     border: 1px solid #eee;
                     background-color: #144433;
                     color: #fff;
                     font-size: 1rem;
                     font-weight: bold;
-                    padding: 7px 30px;
+                    padding: 7px 100px;
                     letter-spacing: 1px;
                     transition: transform 0.5s ease-in;
                     transition: 0.5s;
