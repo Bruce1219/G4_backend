@@ -22,7 +22,7 @@
                         <tr v-for="farm in sortedFarms" :key="farm.f_no">
                             <td>{{ farm.f_no }}</td>
                             <td>{{ farm.f_name }}</td>
-                            <td>{{ farm.f_loc }}</td>
+                            <td>{{ farm.data_name }}</td>
                             <td>{{ farm.f_farmer }}</td>
                             <td>{{ farm.f_intro }}</td>
                             <td>{{ farm.f_status == '1' ? '上架' : '下架' }}</td>
@@ -36,11 +36,7 @@
             </div>
         </div>
 
-        <div
-            class="modal"
-            v-if="showAddFarmModal || showEditFarmModal"
-            @click="closeModalIfBackgroundClicked"
-        >
+        <div class="modal" v-if="showAddFarmModal || showEditFarmModal" @click="closeModalIfBackgroundClicked">
             <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
@@ -51,23 +47,25 @@
                     <label for="farmName">農場名稱</label>
                     <input type="text" id="farmName" v-model="currentFarm.f_name" required />
 
-                    <label for="farmLocation">農場地區</label>
-                    <input type="text" id="farmLocation" v-model="currentFarm.f_loc" required />
+                    <label for="farmRegion">農場地區</label>
+                    <select id="farmRegion" v-model="currentFarm.data_name" required>
+                        <option value="">請選擇農場地區</option>
+                        <option v-for="region in regions" :key="region.city_name" :value="region.city_name">
+                            {{ region.city_name }}
+                        </option>
+                    </select>
 
                     <label for="farmFarmer">農場小農姓名</label>
                     <input type="text" id="farmFarmer" v-model="currentFarm.f_farmer" required />
 
                     <label for="farmIntro">農場簡介</label>
                     <textarea id="farmIntro" v-model="currentFarm.f_intro" required></textarea>
+
                     <label for="farmImageFile">上傳農場圖片</label>
                     <input type="file" id="farmImageFile" @change="handleImageUpload" accept="image/*" />
+
                     <label for="farmImageName">農場圖片名稱</label>
-                    <input
-                        type="text"
-                        id="farmImageName"
-                        v-model="currentFarm.f_img"
-                        placeholder="輸入圖片檔名"
-                    />
+                    <input type="text" id="farmImageName" v-model="currentFarm.f_img" placeholder="輸入圖片檔名" />
 
                     <label for="farmStatus">農場狀態</label>
                     <select id="farmStatus" v-model="currentFarm.f_status" required>
@@ -87,6 +85,7 @@ export default {
     data() {
         return {
             farms: [],
+            regions: [],
             showAddFarmModal: false,
             showEditFarmModal: false,
             modalTitle: '',
@@ -104,41 +103,67 @@ export default {
             try {
                 const response = await fetch('http://localhost/php_g4/farm.php')
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
+                    throw new Error(`HTTP錯誤！狀態：${response.status}`)
                 }
                 const data = await response.json()
-                this.farms = data.data.list
+                if (data.code === 200 && Array.isArray(data.data.list)) {
+                    this.farms = data.data.list
+                    console.log('獲取農場：', this.farms)
+                } else {
+                    throw new Error('意外的數據格式')
+                }
             } catch (error) {
-                console.error('獲取農場列表時發生錯誤:', error)
-                alert('獲取農場列表失敗,請稍後再試。')
+                console.error('獲取農場列表時發生錯誤：', error)
+                alert('獲取農場列表失敗，請稍後再試。')
+            }
+        },
+        async fetchRegions() {
+            try {
+                const response = await fetch('http://localhost/php_g4/farm.php?action=getRegions')
+                if (!response.ok) {
+                    throw new Error(`HTTP錯誤！狀態：${response.status}`)
+                }
+                const data = await response.json()
+                console.log('獲取地區數據：', data)
+                if (data.code === 200 && Array.isArray(data.data.regions)) {
+                    this.regions = data.data.regions
+                    console.log('設置地區：', this.regions)
+                } else {
+                    throw new Error('意外的數據格式')
+                }
+            } catch (error) {
+                console.error('獲取地區列表時發生錯誤：', error)
+                alert('獲取地區列表失敗，請稍後再試。')
             }
         },
         getEmptyFarm() {
             return {
                 f_no: '',
                 f_name: '',
-                f_loc: '',
+                data_name: '',
                 f_farmer: '',
                 f_intro: '',
                 f_img: '',
                 f_status: '1'
             }
         },
-        editFarm(farm) {
+        async editFarm(farm) {
             this.currentFarm = { ...farm }
+            await this.fetchRegions()
             this.modalTitle = '編輯農場'
             this.modalAction = '更新'
             this.showEditFarmModal = true
         },
-        showAddModal() {
+        async showAddModal() {
             this.currentFarm = this.getEmptyFarm()
+            await this.fetchRegions()
             this.modalTitle = '新增農場'
             this.modalAction = '新增'
             this.showAddFarmModal = true
         },
         async saveFarm() {
             try {
-                console.log('Saving farm data:', this.currentFarm)
+                console.log('保存農場數據：', this.currentFarm)
 
                 const method = this.showAddFarmModal ? 'POST' : 'PUT'
                 const url = this.showAddFarmModal
@@ -155,11 +180,11 @@ export default {
 
                 if (!response.ok) {
                     const errorData = await response.json()
-                    throw new Error(errorData.msg || `HTTP error! status: ${response.status}`)
+                    throw new Error(errorData.msg || `HTTP錯誤！狀態：${response.status}`)
                 }
 
                 const result = await response.json()
-                console.log('Server response:', result)
+                console.log('伺服器回應：', result)
 
                 if (result.code === 200) {
                     await this.fetchFarms()
@@ -169,7 +194,7 @@ export default {
                     throw new Error(result.msg || '操作失敗')
                 }
             } catch (error) {
-                console.error('保存農場時發生錯誤:', error)
+                console.error('保存農場時發生錯誤：', error)
                 alert('保存農場失敗，請稍後再試。錯誤詳情：' + error.message)
             }
         },
@@ -180,7 +205,7 @@ export default {
                 })
                 if (!response.ok) {
                     const errorData = await response.json()
-                    throw new Error(errorData.msg || `HTTP error! status: ${response.status}`)
+                    throw new Error(errorData.msg || `HTTP錯誤！狀態：${response.status}`)
                 }
                 const result = await response.json()
                 if (result.code === 200) {
@@ -190,7 +215,7 @@ export default {
                     throw new Error(result.msg || '刪除失敗')
                 }
             } catch (error) {
-                console.error('刪除農場時發生錯誤:', error)
+                console.error('刪除農場時發生錯誤：', error)
                 alert('刪除農場失敗，請稍後再試。錯誤詳情：' + error.message)
             }
         },
@@ -203,15 +228,19 @@ export default {
             if (event.target.className === 'modal') {
                 this.closeModal()
             }
+        },
+        handleImageUpload(event) {
+            const file = event.target.files[0]
+            if (file) {
+                this.currentFarm.f_img = file.name
+            }
         }
     },
-    mounted() {
-        this.fetchFarms()
+    async mounted() {
+        await this.fetchFarms()
     }
 }
 </script>
-
-
 <style lang="scss" scoped>
 $fontBase: 16px;
 $lineheight: 1.5;

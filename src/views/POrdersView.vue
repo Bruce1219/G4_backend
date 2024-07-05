@@ -11,6 +11,7 @@
                         <th scope="col">會員編號</th>
                         <th scope="col">訂購人</th>
                         <th scope="col">訂單日期</th>
+                        <th scope="col">出貨日期</th>
                         <th scope="col">金額</th>
                         <th scope="col">訂單狀態</th>
                         <th scope="col">操作</th>
@@ -22,6 +23,7 @@
                         <td>{{ order.m_no }}</td>
                         <td>{{ order.po_name }}</td>
                         <td>{{ order.po_time }}</td>
+                        <td>{{ order.po_deliverdate }}</td>
                         <td>NT$ {{ order.po_total }}</td>
                         <td>
                             <select v-model="order.po_status" @change="updateOrderStatus(order)">
@@ -47,6 +49,7 @@
                 <p><strong>訂單編號:</strong> {{ selectedOrder.po_no }}</p>
                 <p><strong>會員姓名:</strong> {{ selectedOrder.po_name }}</p>
                 <p><strong>訂單日期:</strong> {{ selectedOrder.po_time }}</p>
+                <p><strong>出貨日期:</strong> {{ selectedOrder.po_deliverdate }}</p>
                 <p><strong>訂單狀態:</strong> {{ getStatusText(selectedOrder.po_status) }}</p>
 
                 <h3>訂單商品</h3>
