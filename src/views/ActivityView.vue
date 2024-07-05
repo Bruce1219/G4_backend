@@ -70,7 +70,7 @@
                 </div>
                 <div>
                     <span>新增圖片 : </span> 
-                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" @change="getfile"/>
+                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" @change="getfile($event)"/>
                 </div>
                 <div>
                     <span>活動名稱 : </span>
@@ -171,6 +171,7 @@ export default {
             editSwitch: false,
             deleteSwitch: false,
             activities: [],
+            // data: {},
             a_no: '',
             c_no: '',
             a_img: null,
@@ -231,11 +232,16 @@ export default {
             }
         },
         confirm() {
+            // let formData = new FormData();
+            // formData.append("a",this.file)
+            // let fileData =  JSON.stringify(formData);
+            // console.log(typeof data);
+            this.fetchImage();
             const url = `http://localhost/php_G4/addEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
-                a_img: this.a_img,
+                a_img: this.file.name,
                 a_name: this.a_name,
                 a_loc: this.a_loc,
                 a_max: this.a_max,
@@ -257,12 +263,15 @@ export default {
             }
             fetch(url, {
                 method: 'POST',
-                body: JSON.stringify(body)
+                // body:fileData,
+                body:JSON.stringify(body),
+                headers:{'content-type':'multipart/form-data"'}
             })
                 .then((res) => res.json())
                 .then((json) => {
-                    this.data = json
-                    console.log(this.data)
+                    // 檢查是否有 this.data
+                    this.activities = json
+                    console.log('TEST: ' + this.activities)
                     if (
                         this.data != null ||
                         this.a_no != null ||
@@ -288,10 +297,26 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
+        },fetchImage () {
+            let formData = new FormData();
+            formData.append("a_img",this.file)
+            // let fileData =  JSON.stringify(formData);
+            fetch(`http://localhost/php_G4/addEventImage.php`,{
+                method:'POST',
+                body:formData,
+            })
+            .then((res) =>res.json)
+            .then((json)=>{
+                this.activities = json;
+            })
+
         },
         getfile(event) {
-            this.file = event.target.files[0];
+            this.file = event.target.files[0]
+            this.a_img = this.file.name
+            console.log(this.a_img)
             console.log(this.file)
+            console.log(typeof this.file)
         },
         editEvent(event,index) {
             event.stopPropagation()
@@ -347,6 +372,7 @@ export default {
         fetchDate() {
             fetch(`http://localhost/php_G4/activitiesList.php`, {
                 method: 'POST'
+                
             })
                 .then((res) => res.json())
                 .then((json) => {
@@ -386,7 +412,7 @@ export default {
                 .then((res) => res.json())
                 .then((json) => {
                     this.data = json
-                    console.log(this.data)
+                    
                     if (
                         this.data != null ||
                         this.a_no != null ||
@@ -408,6 +434,8 @@ export default {
                     } else {
                         alert(this.data.msg)
                     }
+
+                    console.log(this.data)
                 })
                 .catch((error) => {
                     console.error('Error:', error)
