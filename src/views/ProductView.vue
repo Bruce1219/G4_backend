@@ -27,7 +27,7 @@
                             <td>{{ product.f_name }}</td>
                             <td>NT$ {{ product.p_fee }}</td>
                             <td>{{ product.p_unit }}</td>
-                            <td>{{ product.p_popular === '0' ? '熱門商品' : '一般商品' }}</td>
+                            <td>{{ product.p_popular == '0' ? '熱門商品' : '一般商品' }}</td>
                             <td>
                                 <button @click="editProduct(product)" class="edit">編輯</button>
                                 <button @click="deleteProduct(product.p_no)" class="delete">刪除</button>

@@ -24,12 +24,12 @@
                             <td>{{ member.m_account }}</td>
                             <td>{{ member.m_phone }}</td>
                             <td>{{ member.m_add }}</td>
-                            <td :class="member.m_status === '1' ? 'normal' : 'useless'">
-                                {{ member.m_status === '1' ? '正常' : '停權' }}
+                            <td :class="member.m_status == '1' ? 'normal' : 'useless'">
+                                {{ member.m_status == '1' ? '正常' : '停權' }}
                             </td>
                             <td>
                                 <button @click="toggleStatus(member)" :class="member.m_status === '1' ? 'useless' : 'normal'">
-                                    {{ member.m_status === '1' ? '停權' : '啟用' }}
+                                    {{ member.m_status == '1' ? '停權' : '啟用' }}
                                 </button>
                             </td>
                         </tr>
