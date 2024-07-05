@@ -3,6 +3,13 @@
         <div class="container">
             <div>
                 <h1>活動訂單管理</h1>
+                <div class="filter-product" @change="activedClass()">
+                    <select name="filter" id="filter">
+                        <option value="3">全部</option>
+                        <option value="1">已報名</option>
+                        <option value="0">已取消</option>
+                    </select>
+                </div>
             </div>
             <div class="wrap-table">
                 <table>
@@ -19,7 +26,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(user, index) in a_orders" :key="user.ao_no">
+                        <tr v-for="(user, index) in filterDataDisplay" :key="user.ao_no">
                             <td>{{ user.ao_no }}</td>
                             <td>{{ user.a_no }}</td>
                             <td>{{ user.m_no }}</td>
@@ -124,16 +131,34 @@
 </template>
 
 <script>
+// import { toHandlers } from 'vue'
+
 export default {
     data() {
         return {
+            selectedNum: 0,
             a_orders: [],
             display: [],
+            currentClass: '3',
             addSwitch: false,
             ao_no: '',
             ao_status: '',
             a_no: '',
             ao_count: ''
+        }
+    },
+    computed: {
+        filterDataDisplay() {
+            // let filteredData = this.a_orders;
+            // this.display = this.filteredData;
+            // console.log(filteredData)
+            if (this.currentClass === '3') {
+                return this.a_orders
+            } else {
+                return this.a_orders.filter((user) => {
+                    return user.ao_status == this.currentClass
+                })
+            }
         }
     },
     methods: {
@@ -145,15 +170,23 @@ export default {
                 .then((json) => {
                     this.a_orders = json['data']['list']
                     console.log(json)
-                    console.log(this.admin)
+                    console.log(this.a_orders)
+                    if (this.currentClass === '3') {
+                        this.display = this.a_orders
+                        console.log(this.display)
+                    } else {
+                        this.display = this.a_orders.filter((user) => {
+                            return user.ao_status == this.currentClass
+                        })
+                    }
                 })
         },
         checkAorder(event, index) {
             event.stopPropagation() // 阻止事件冒泡
             if (this.addSwitch === false) {
                 this.addSwitch = true
-                this.display = this.a_orders[index]
-                // this.a_orders = this.a_orders[index]
+                console.log(this.display)
+                this.display = this.filterDataDisplay[index]
             } else {
                 this.addSwitch = false
                 this.display = []
@@ -199,6 +232,10 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
+        },
+        activedClass() {
+            let activeClass = document.querySelector('#filter') // //偵測目前商品類別為何
+            this.currentClass = activeClass.value
         }
     },
     mounted() {
@@ -231,20 +268,31 @@ export default {
                 font-family: $titleFont;
                 font-weight: bold;
             }
-            button {
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: solid 1px transparent;
-                padding: 7px 15px;
-                margin: 5px 0;
-                border-radius: 10px;
-                transition: 0.5s;
-                box-sizing: border-box;
-                &:hover {
-                    background-color: #fff;
+            .filter-product {
+                display: flex;
+                align-items: center;
+                // margin-bottom: $mbbtwElement;
+                select {
+                    height: 30px;
+                    width: 150px;
                     border: solid 1px $darkGreen;
+                    font-family: $pFont;
+                    $line-height: $fontBase;
+                    font-size: $fontBase;
                     color: $darkGreen;
+                    padding: 0 10px;
+                    outline: none;
+                    color: grey;
+                    &:focus {
+                        outline: none;
+                        &::placeholder {
+                            color: transparent;
+                        }
+                    }
+                    option {
+                        background-color: #f3eeea;
+                        border: 0px solid #f3eeea;
+                    }
                 }
             }
         }
@@ -375,7 +423,7 @@ export default {
             font-size: 2.25rem;
             font-family: $titleFont;
             font-weight: bold;
-            // border-bottom: solid 1px grey;
+            border-bottom: solid 1px #d9d9d9;
         }
         form {
             margin-top: 10px;
@@ -383,12 +431,14 @@ export default {
             display: flex;
             flex-direction: column;
             align-items: center;
-            // border-top: solid 1px grey;
+            // border-top: solid 1px #eee;
             div {
                 width: 80%;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                // display: grid;
+                // grid-template-columns: 1fr 2fr;
                 margin: 15px 0;
                 span {
                     color: $darkGreen;
