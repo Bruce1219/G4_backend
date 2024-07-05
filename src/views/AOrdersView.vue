@@ -119,10 +119,13 @@
                     <button
                         type="button"
                         class="confirm"
-                        @click="toggleStatus()"
+                        @click="click()"
                         v-if="display.ao_status == 1"
                     >
                         取消報名
+                    </button>
+                    <button type="button" class="confirm cancel" v-if="display.ao_status == 0">
+                        已取消
                     </button>
                 </div>
             </form>
@@ -236,6 +239,12 @@ export default {
         activedClass() {
             let activeClass = document.querySelector('#filter') // //偵測目前商品類別為何
             this.currentClass = activeClass.value
+        },
+        click() {
+            let yes = confirm('確定取消?')
+            if (yes) {
+                this.toggleStatus()
+            }
         }
     },
     mounted() {
@@ -489,11 +498,11 @@ export default {
                 .cancel {
                     background-color: $red;
                     color: #fff;
-                    &:hover {
-                        background-color: #fff;
-                        color: $red;
-                        border: solid 1px $red;
-                    }
+                    // &:hover {
+                    //     background-color: #fff;
+                    //     color: $red;
+                    //     border: solid 1px $red;
+                    // }
                 }
             }
         }
