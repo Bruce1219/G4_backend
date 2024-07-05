@@ -4,43 +4,38 @@
             <div>
                 <h1>會員管理</h1>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">會員名稱</th>
-                        <th scope="col">年齡</th>
-                        <th scope="col">帳號</th>
-                        <th scope="col">電話</th>
-                        <th scope="col">地址</th>
-                        <th scope="col">狀態</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="user in member" :key="user.m_no">
-                        <td>{{ user.m_name }}</td>
-                        <td>{{ user.m_age }}</td>
-                        <td>{{ user.m_account }}</td>
-                        <td>{{ user.m_phone }}</td>
-                        <td>{{ user.m_address }}</td>
-                        <td>
-                            <button
-                                class="normal"
-                                v-if="user.m_status === '正常'"
-                                @click="toggleStatus(user)"
-                            >
-                                正常
-                            </button>
-                            <button
-                                class="useless"
-                                v-if="user.m_status === '停權'"
-                                @click="toggleStatus(user)"
-                            >
-                                停權
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">會員名稱</th>
+                            <th scope="col">會員生日</th>
+                            <th scope="col">帳號</th>
+                            <th scope="col">電話</th>
+                            <th scope="col">地址</th>
+                            <th scope="col">狀態</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="member in members" :key="member.m_no">
+                            <td>{{ member.m_name }}</td>
+                            <td>{{ member.m_birth }}</td>
+                            <td>{{ member.m_account }}</td>
+                            <td>{{ member.m_phone }}</td>
+                            <td>{{ member.m_add }}</td>
+                            <td :class="member.m_status == '1' ? 'normal' : 'useless'">
+                                {{ member.m_status == '1' ? '正常' : '停權' }}
+                            </td>
+                            <td>
+                                <button @click="toggleStatus(member)" :class="member.m_status === '1' ? 'useless' : 'normal'">
+                                    {{ member.m_status == '1' ? '停權' : '啟用' }}
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </section>
 </template>
@@ -49,64 +44,73 @@
 export default {
     data() {
         return {
-            member: [
-                {
-                    m_no: '001',
-                    m_name: '張小凡',
-                    m_age: 28,
-                    m_account: 'xiaoming.zhang@example.com',
-                    m_phone: '0912345678',
-                    m_address: '台北市中正區信義路一段123號',
-                    m_status: '正常'
-                },
-                {
-                    m_no: '002',
-                    m_name: '薩爾達',
-                    m_age: 33,
-                    m_account: 'meili.li@example.com',
-                    m_phone: '0912345678',
-                    m_address: '台北市中正區信義路一段123號',
-                    m_status: '正常'
-                },
-                {
-                    m_no: '003',
-                    m_name: '大鼓祥平',
-                    m_age: 32,
-                    m_account: 'dahua.wang@example.com',
-                    m_phone: '0912345678',
-                    m_address: '台北市中正區信義路一段123號',
-                    m_status: '正常'
-                },
-                {
-                    m_no: '004',
-                    m_name: '五條悟',
-                    m_age: 44,
-                    m_account: 'shufen.chen@example.com',
-                    m_phone: '0912345678',
-                    m_address: '台北市中正區信義路一段123號',
-                    m_status: '正常'
-                },
-                {
-                    m_no: '005',
-                    m_name: '孫安卓',
-                    m_age: 18,
-                    m_account: 'zhiqiang.lin@example.com',
-                    m_phone: '0912345678',
-                    m_address: '台北市中正區信義路一段123號',
-                    m_status: '停權'
-                }
-            ]
+            members: []
         }
     },
     methods: {
-        toggleStatus(user) {
-            user.m_status = user.m_status === '正常' ? '停權' : '正常'
+        async fetchMembers() {
+            try {
+                const response = await fetch('http://localhost/php_g4/memberd.php')
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data = await response.json()
+                if (data.code === 200 && Array.isArray(data.data.list)) {
+                    this.members = data.data.list
+                } else {
+                    throw new Error(data.msg || 'Unexpected data format received from the server')
+                }
+            } catch (error) {
+                console.error('獲取會員列表時發生錯誤:', error)
+                alert('獲取會員列表失敗，請稍後再試。錯誤詳情：' + error.message)
+            }
+        },
+        async toggleStatus(member) {
+            try {
+                const newStatus = member.m_status === '1' ? '0' : '1'
+                const response = await fetch('http://localhost/php_g4/memberd.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'updateStatus',
+                        m_no: member.m_no,
+                        m_status: newStatus
+                    })
+                })
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+
+                const data = await response.json()
+                if (data.code === 200) {
+                    member.m_status = newStatus
+                } else {
+                    throw new Error(data.msg || '更新狀態失敗')
+                }
+            } catch (error) {
+                console.error('更新會員狀態時發生錯誤:', error)
+                alert('更新會員狀態失敗，請稍後再試。錯誤詳情：' + error.message)
+            }
         }
+    },
+    mounted() {
+        this.fetchMembers()
     }
 }
 </script>
 
 <style lang="scss" scoped>
+$fontBase: 16px;
+$lineheight: 1.5;
+$letterSpacing: 0.05em;
+$pFont: Arial, sans-serif;
+$titleFont: 'Noto Sans TC', sans-serif;
+$darkGreen: #144433;
+$red: #ff4444;
+
 .section {
     font-size: $fontBase;
     line-height: $lineheight;
@@ -115,114 +119,111 @@ export default {
     cursor: default;
     width: 100%;
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+
     .container {
         width: 80%;
         padding: 30px;
-        margin: 0;
-        div {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        margin-left: 250px;
+
+        > div:first-child {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
             h1 {
                 font-size: 2.25em;
                 font-family: $titleFont;
                 font-weight: bold;
-            }
-            button {
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: solid 1px transparent;
-                padding: 7px 15px;
-                margin: 5px 0;
-                border-radius: 10px;
-                transition: 0.5s;
-                box-sizing: border-box;
-                &:hover {
-                    background-color: #fff;
-                    border: solid 1px $darkGreen;
-                    color: $darkGreen;
-                }
+                margin: 0;
             }
         }
 
-        table {
-            width: 100%;
-            margin-top: 30px;
-            // border: solid 1px $darkGreen;
-            background-color: #fff;
-            border-collapse: separate;
-            border-spacing: 0;
-            thead {
-                line-height: 3;
-                text-align: center;
-                font-weight: bold;
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+
+            table {
+                width: 100%;
+                background-color: #fff;
                 border-collapse: separate;
-                border-radius: 20px;
-            }
-            tr {
-                border-collapse: separate;
-                border-radius: 20px;
-            }
-            th {
-                color: #144433;
-                font-size: 16px;
-                padding: 10px;
-                border: solid 1px $darkGreen;
-            }
-            td {
-                font-size: 16px;
-                margin: 0 3px;
-                line-height: 3;
-                text-align: center;
-                border: solid 1px $darkGreen;
-            }
-            /*第一欄第一列：左上*/
-            tr:first-child th:first-child {
-                border-top-left-radius: 20px;
-            }
-            /*第一欄最後列：左下*/
-            tr:last-child td:first-child {
-                border-bottom-left-radius: 20px;
-            }
-            /*最後欄第一列：右上*/
-            tr:first-child th:last-child {
-                border-top-right-radius: 20px;
-            }
-            /*最後欄第一列：右下*/
-            tr:last-child td:last-child {
-                border-bottom-right-radius: 20px;
-            }
-            td:last-child {
-                line-height: 1;
-            }
-            .normal {
-                // width: 20px;
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: none;
-                padding: 7px 15px;
-                margin: 5px 10px;
-                border-radius: 20px;
-                transition: 0.5s;
-                &:hover {
-                    background-color: $red;
-                }
-            }
-            .useless {
-                // width: 20px;
-                color: #fff;
-                text-decoration: none;
-                background-color: $red;
-                border: none;
-                padding: 7px 15px;
-                margin: 5px 10px;
-                border-radius: 20px;
-                transition: 0.5s;
-                &:hover {
+                border-spacing: 0;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+                thead {
                     background-color: $darkGreen;
+                    color: #fff;
+                    position: sticky;
+                    top: 0;
+                    z-index: 1;
+
+                    th {
+                        padding: 15px;
+                        text-align: left;
+                        font-weight: bold;
+                    }
+                }
+
+                tbody {
+                    tr {
+                        &:nth-child(even) {
+                            background-color: #f8f8f8;
+                        }
+
+                        td {
+                            padding: 15px;
+                            border-bottom: 1px solid #ddd;
+
+                            &:last-child {
+                                text-align: center;
+                            }
+
+                            &.normal, &.useless {
+                                font-weight: bold;
+                            }
+
+                            &.normal {
+                                color: $darkGreen;
+                            }
+
+                            &.useless {
+                                color: $red;
+                            }
+
+                            button.normal, button.useless {
+                                color: #fff;
+                                border: none;
+                                padding: 5px 10px;
+                                border-radius: 20px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                            }
+
+                            button.normal {
+                                background-color: $darkGreen;
+
+                                &:hover {
+                                    background-color: darken($darkGreen, 10%);
+                                }
+                            }
+
+                            button.useless {
+                                background-color: $red;
+
+                                &:hover {
+                                    background-color: darken($red, 10%);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
