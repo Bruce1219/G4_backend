@@ -3,213 +3,275 @@
         <div class="container">
             <div>
                 <h1>商品管理</h1>
-                <button @click="addAdmin($event)">+ 新增商品</button>
+                <button @click="showAddModal">+ 新增商品</button>
             </div>
-            <div class="wrap-table">
+            <div class="table-container">
                 <table>
-                <thead>
-                    <tr>
-                        <th scope="col">商品編號</th>
-                        <th scope="col">商品圖片</th>
-                        <th scope="col">商品名稱</th>
-                        <th scope="col">商品類別</th>
-                        <th scope="col">農場名稱</th>
-                        <th scope="col">金額</th>
-                        <th scope="col">熱門商品</th>
-                        <th scope="col">狀態</th>
-                        <th scope="col">操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="item in product" :key="item.n_no">
-                        <td>{{ item.n_no }}</td>
-                        <td>
-                            <div class="pic">
-                                <img :src="parsePic(item.p_img)" alt="最新消息圖片" />
-                            </div>
-                        </td>
-                        <td>{{ item.p_name }}</td>
-                        <td>{{ item.pc_no }}</td>
-                        <td>{{ item.f_no }}</td>
-                        <td>NT$ {{ item.p_fee }}</td>
-                        <td><input type="checkbox" /><span>請勾選</span></td>
-                        <td>
-                            <select name="" id="">
-                                <option value="">上架</option>
-                                <option value="">下架</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="edit">編輯</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    <thead>
+                        <tr>
+                            <th scope="col">商品編號</th>
+                            <th scope="col">商品名稱</th>
+                            <th scope="col">商品類別</th>
+                            <th scope="col">農場名稱</th>
+                            <th scope="col">價格</th>
+                            <th scope="col">購買單位</th>
+                            <th scope="col">熱門度</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="product in sortedProducts" :key="product.p_no">
+                            <td>{{ product.p_no }}</td>
+                            <td>{{ product.p_name }}</td>
+                            <td>{{ product.pc_name }}</td>
+                            <td>{{ product.f_name }}</td>
+                            <td>NT$ {{ product.p_fee }}</td>
+                            <td>{{ product.p_unit }}</td>
+                            <td>{{ product.p_popular == '0' ? '熱門商品' : '一般商品' }}</td>
+                            <td>
+                                <button @click="editProduct(product)" class="edit">編輯</button>
+                                <button @click="deleteProduct(product.p_no)" class="delete">刪除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            
+        </div>
+
+        <div class="modal" v-if="showAddProductModal || showEditProductModal" @click="closeModalIfBackgroundClicked">
+            <div class="modal-content" @click.stop>
+                <span class="close" @click="closeModal">&times;</span>
+                <h2>{{ modalTitle }}</h2>
+                <form @submit.prevent="saveProduct">
+                    <label v-if="showEditProductModal" for="productNo">商品編號</label>
+                    <input v-if="showEditProductModal" type="text" id="productNo" v-model="currentProduct.p_no" readonly />
+
+                    <label for="productName">商品名稱</label>
+                    <input type="text" id="productName" v-model="currentProduct.p_name" required />
+
+                    <label for="productCategory">商品類別</label>
+                    <select id="productCategory" v-model="currentProduct.pc_no" required>
+                        <option v-for="category in uniqueCategories" :key="category.pc_no" :value="category.pc_no">
+                            {{ category.pc_name }}
+                        </option>
+                    </select>
+
+                    <label for="productFarm">農場名稱</label>
+                    <select id="productFarm" v-model="currentProduct.f_no" required>
+                        <option v-for="farm in uniqueFarms" :key="farm.f_no" :value="farm.f_no">
+                            {{ farm.f_name }}
+                        </option>
+                    </select>
+
+                    <label for="productFee">商品價格</label>
+                    <input type="number" id="productFee" v-model="currentProduct.p_fee" required min="0" />
+
+                    <label for="productUnit">購買單位</label>
+                    <input type="text" id="productUnit" v-model="currentProduct.p_unit" required />
+
+                    <label for="productPopular">商品熱門度</label>
+                    <select id="productPopular" v-model="currentProduct.p_popular" required>
+                        <option value="0">熱門商品</option>
+                        <option value="1">一般商品</option>
+                    </select>
+
+                    <label for="productDescription">商品描述</label>
+                    <textarea id="productDescription" v-model="currentProduct.p_info" required></textarea>
+
+                    <div v-for="(image, index) in currentProduct.p_img" :key="index">
+                        <label :for="'productImage' + (index + 1)">商品圖片 {{ index + 1 }}</label>
+                        <input type="text" :id="'productImageName' + (index + 1)" v-model="currentProduct.p_img[index]" :placeholder="'輸入圖片 ' + (index + 1) + ' 檔名'" />
+                        <input type="file" :id="'productImageFile' + (index + 1)" @change="handleImageUpload($event, index)" accept="image/*" />
+                    </div>
+
+                    <button type="submit">{{ modalAction }}</button>
+                </form>
+            </div>
         </div>
     </section>
-    <div class="section-addAdmin" v-show="addSwitch" @click="addAdmin($event)">
-        <div class="addAdmin" @click.stop>
-            <h2>新增管理員</h2>
-            <form action="#">
-                <!-- <div>
-                    <span>管理員代號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員編號"
-                        v-model="am_no"
-                    />
-                </div> -->
-                <!-- <div>
-                    <span>管理員帳號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員帳號"
-                        v-model="am_account"
-                    />
-                </div> -->
-                <div>
-                    <span>管理員密碼 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員密碼"
-                        v-model="am_password"
-                    />
-                </div>
-                <div>
-                    <span>管理員等級 : </span>
-                    <select v-model="am_level">
-                        <option value="" disabled selected>請選擇管理員等級</option>
-                        <option value="1">超級管理員</option>
-                        <option value="2">一般管理員</option>
-                    </select>
-                </div>
-                <div>
-                    <span>管理員狀態 : </span>
-                    <select v-model="am_status">
-                        <option value="" disabled selected>請選擇管理員狀態</option>
-                        <option value="1">正常</option>
-                        <option value="0">停權</option>
-                    </select>
-                </div>
-                <div class="button">
-                    <button type="button" class="cancel" @click="addAdmin($event)">取消</button>
-                    <button type="button" class="confirm" @click="confirm()">儲存</button>
-                </div>
-            </form>
-        </div>
-    </div>
 </template>
 
 <script>
 export default {
     data() {
         return {
-            addSwitch: false,
-            product: [
-                {
-                    n_no: 'A001',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'pumpkin.png',
-                    n_time: '2024-06-04',
-                    p_name: '南瓜',
-                    pc_no: '蔬果',
-                    f_no: '黑壓壓農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: 'A002',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'taro.png',
-                    n_time: '2024-06-04',
-                    p_name: '芋頭',
-                    pc_no: '蔬果',
-                    f_no: '嘿嘿齁農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: 'A003',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    p_img: 'strawberry2.png',
-                    n_time: '2024-06-04',
-                    p_name: '草莓',
-                    pc_no: '蔬果',
-                    f_no: '逼逼波農場',
-                    p_fee: 600,
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                }
-            ]
+            products: [],
+            farms: [],
+            showAddProductModal: false,
+            showEditProductModal: false,
+            modalTitle: '',
+            modalAction: '',
+            currentProduct: this.getEmptyProduct()
+        }
+    },
+    computed: {
+        sortedProducts() {
+            return [...this.products].sort((a, b) => {
+                const aStr = typeof a.p_no === 'string' ? a.p_no : '';
+                const bStr = typeof b.p_no === 'string' ? b.p_no : '';
+                const aNumber = parseInt(aStr.replace(/\D/g, '') || '0', 10);
+                const bNumber = parseInt(bStr.replace(/\D/g, '') || '0', 10);
+                return aNumber - bNumber;
+            });
+        },
+        uniqueCategories() {
+            const categories = this.products.map((product) => ({
+                pc_no: product.pc_no,
+                pc_name: product.pc_name
+            }))
+            return Array.from(new Map(categories.map((item) => [item.pc_no, item])).values())
+        },
+        uniqueFarms() {
+            return this.farms
         }
     },
     methods: {
-        // toggleStatus(user) {
-        //     user.status = user.status === '正常' ? '停用' : '正常'
-        // },
-        parsePic(file) {
-            return new URL(`../assets/image/${file}`, import.meta.url).href
-        },
-        addAdmin(event) {
-            event.stopPropagation() // 阻止事件冒泡
-            if (this.addSwitch === false) {
-                this.addSwitch = true
-                console.log(this.addSwitch)
-            } else {
-                this.addSwitch = false
-                ;(this.am_password = ''), (this.am_level = ''), (this.am_status = '')
+        async fetchProducts() {
+            try {
+                const response = await fetch('http://localhost/php_g4/product_api.php')
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data = await response.json()
+                this.products = data.data.list.map(product => ({
+                    ...product,
+                    p_no: product.p_no ? String(product.p_no) : ''
+                }))
+            } catch (error) {
+                console.error('獲取商品列表時發生錯誤:', error)
+                alert('獲取商品列表失敗,請稍後再試。')
             }
         },
-        confirm() {
-            if (this.am_password === '' || this.am_level === '' || this.am_status === '') {
-                alert('請填完所有欄位')
-                return false
+        async fetchFarms() {
+            try {
+                const response = await fetch('http://localhost/php_g4/farm.php')
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+                const data = await response.json()
+                return data.data.list
+            } catch (error) {
+                console.error('獲取農場列表時發生錯誤:', error)
+                alert('獲取農場列表失敗，請稍後再試。')
+                return []
             }
-            const url = `http://localhost/php_g4/addAdmin.php`
-            let body = {
-                am_account: this.am_account,
-                am_password: this.am_password,
-                am_level: this.am_level,
-                am_status: this.am_status
+        },
+        getEmptyProduct() {
+            return {
+                p_no: '',
+                p_name: '',
+                pc_no: '',
+                f_no: '',
+                p_fee: 0,
+                p_unit: '',
+                p_info: '',
+                p_img: ['', '', '', ''],
+                p_popular: '1'
             }
+        },
+        async editProduct(product) {
+            this.currentProduct = {
+                ...product,
+                p_img: product.p_img.length ? product.p_img : ['', '', '', ''],
+                p_popular: product.p_popular || '1'
+            }
+            this.modalTitle = '編輯商品'
+            this.modalAction = '更新'
+            this.showEditProductModal = true
+            this.farms = await this.fetchFarms()
+        },
+        async showAddModal() {
+            this.currentProduct = this.getEmptyProduct()
+            this.modalTitle = '新增商品'
+            this.modalAction = '新增'
+            this.showAddProductModal = true
+            this.farms = await this.fetchFarms()
+        },
+        async saveProduct() {
+            try {
+                this.currentProduct.p_img = this.currentProduct.p_img.filter(
+                    (img) => img.trim() !== ''
+                )
 
-            fetch(url, {
-                method: 'POST',
-                body: JSON.stringify(body)
-            })
-                .then((response) => response.json())
-                .then((json) => {
-                    this.data = json
-                    if (this.data.code === 200) {
-                        alert('新增成功')
-                        this.addSwitch = false
-                        this.fetchData() // 新增成功後重新獲取資料
-                    } else {
-                        alert(this.data.msg)
+                const method = this.showAddProductModal ? 'POST' : 'PUT'
+                const url = this.showAddProductModal
+                    ? 'http://localhost/php_g4/product_api.php'
+                    : `http://localhost/php_g4/product_api.php?id=${this.currentProduct.p_no}`
+
+                const response = await fetch(url, {
+                    method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(this.currentProduct)
+                })
+
+                if (!response.ok) {
+                    const errorData = await response.json()
+                    throw new Error(errorData.msg || `HTTP error! status: ${response.status}`)
+                }
+
+                const result = await response.json()
+                if (result.code === 200) {
+                    await this.fetchProducts()
+                    this.closeModal()
+                    alert(result.msg || '操作成功')
+                } else {
+                    throw new Error(result.msg || '操作失敗')
+                }
+            } catch (error) {
+                console.error('保存商品時發生錯誤:', error)
+                alert('保存商品失敗，請稍後再試。錯誤詳情：' + error.message)
+            }
+        },
+        async deleteProduct(productId) {
+            if (confirm('確定要刪除此商品嗎?')) {
+                try {
+                    const response = await fetch(
+                        `http://localhost/php_g4/product_api.php?id=${productId}`,
+                        { method: 'DELETE' }
+                    )
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`)
                     }
-                })
-                .catch((error) => {
-                    console.error('Error:', error)
-                })
+                    await this.fetchProducts()
+                } catch (error) {
+                    console.error('刪除商品時發生錯誤:', error)
+                    alert('刪除商品失敗,請稍後再試。')
+                }
+            }
+        },
+        closeModal() {
+            this.showAddProductModal = false
+            this.showEditProductModal = false
+            this.currentProduct = this.getEmptyProduct()
+        },
+        closeModalIfBackgroundClicked(event) {
+            if (event.target.className === 'modal') {
+                this.closeModal()
+            }
+        },
+        handleImageUpload(event, index) {
+            const file = event.target.files[0]
+            if (file) {
+                this.currentProduct.p_img[index] = file.name
+            }
         }
+    },
+    async mounted() {
+        await this.fetchProducts()
+        this.farms = await this.fetchFarms()
     }
 }
 </script>
 
 <style lang="scss" scoped>
+$fontBase: 16px;
+$lineheight: 1.5;
+$letterSpacing: 0.05em;
+$pFont: Arial, sans-serif;
+$titleFont: 'Noto Sans TC', sans-serif;
+$darkGreen: #144433;
+$red: #ff4444;
+
 .section {
     font-size: $fontBase;
     line-height: $lineheight;
@@ -218,31 +280,40 @@ export default {
     cursor: default;
     width: 100%;
     display: flex;
-    flex-direction: row-reverse;
-    justify-content: flex-start;
+    flex-direction: column;
+    align-items: center;
+
     .container {
         width: 80%;
-        height: 85vh; //寫死高度
         padding: 30px;
-        margin: 0;
-        div {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 60px);
+        margin-left: 250px;
+
+        > div:first-child {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
             h1 {
                 font-size: 2.25em;
                 font-family: $titleFont;
                 font-weight: bold;
+                margin: 0;
             }
+
             button {
                 color: #fff;
                 text-decoration: none;
                 background-color: $darkGreen;
                 border: solid 1px transparent;
-                padding: 7px 15px;
-                margin: 5px 0;
-                border-radius: 10px;
-                transition: 0.5s;
-                box-sizing: border-box;
+                padding: 10px 20px;
+                border-radius: 5px;
+                transition: 0.3s;
+                cursor: pointer;
+
                 &:hover {
                     background-color: #fff;
                     border: solid 1px $darkGreen;
@@ -250,208 +321,179 @@ export default {
                 }
             }
         }
-        .wrap-table{
-            //有scrollbar
-            width: 100%;
-            height: 75%;
-            overflow: auto;
-            margin-top: 30px;
-            table {
-            width: 100%;
-            margin-top: 30px;
-            // border: solid 1px $darkGreen;
-            background-color: #fff;
-            border-collapse: separate;
-            border-spacing: 0;
-            thead {
-                line-height: 3;
-                text-align: center;
-                font-weight: bold;
-                border-collapse: separate;
-                border-radius: 20px;
-            }
-            tr {
-                border-collapse: separate;
-                border-radius: 20px;
-                vertical-align: middle; /* 垂直居中對齊 */
-            }
-            th {
-                color: #144433;
-                font-size: 16px;
-                padding: 10px;
-                border: solid 1px $darkGreen;
-            }
-            td {
-                font-size: 16px;
-                margin: 0 3px;
-                line-height: 3;
-                text-align: center;
-                border: solid 1px $darkGreen;
-                vertical-align: middle; /* 垂直居中對齊 */
-            }
-            /*第一欄第一列：左上*/
-            tr:first-child th:first-child {
-                border-top-left-radius: 20px;
-            }
-            /*第一欄最後列：左下*/
-            tr:last-child td:first-child {
-                border-bottom-left-radius: 20px;
-            }
-            /*最後欄第一列：右上*/
-            tr:first-child th:last-child {
-                border-top-right-radius: 20px;
-            }
-            /*最後欄第一列：右下*/
-            tr:last-child td:last-child {
-                border-bottom-right-radius: 20px;
-            }
-            td:last-child {
-                line-height: 1;
-            }
-            .pic {
-                display: flex;
-                align-items: center; /* 垂直居中對齊 */
-                justify-content: center; /* 水平居中對齊 */
-                padding: 5px;
-                img {
-                    width: 100px;
-                    height: 80px;
-                    object-fit: cover;
-                    // vertical-align: top;
-                    display: block;
-                    margin: 0 auto; /* 水平居中 */
-                }
-            }
-            .edit {
-                // width: 20px;
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: none;
-                padding: 7px 20px;
-                margin: 5px 0;
-                border-radius: 20px;
-                transition: 0.5s;
-                &:hover {
-                    background-color: $red;
-                }
-            }
-        }
-        }
 
+        .table-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+
+            table {
+                width: 100%;
+                background-color: #fff;
+                border-collapse: separate;
+                border-spacing: 0;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+
+                thead {
+                    background-color: $darkGreen;
+                    color: #fff;
+                    position: sticky;
+                    top: 0;
+                    z-index: 1;
+
+                    th {
+                        padding: 15px;
+                        text-align: left;
+                        font-weight: bold;
+                    }
+                }
+
+                tbody {
+                    tr {
+                        &:nth-child(even) {
+                            background-color: #f8f8f8;
+                        }
+
+                        td {
+                            padding: 15px;
+                            border-bottom: 1px solid #ddd;
+
+                            &:last-child {
+                                text-align: center;
+                            }
+
+                            .edit,
+                            .delete {
+                                color: #fff;
+                                border: none;
+                                padding: 5px 10px;
+                                border-radius: 3px;
+                                cursor: pointer;
+                                transition: 0.3s;
+                                margin: 0 2px;
+                            }
+
+                            .edit {
+                                background-color: $darkGreen;
+
+                                &:hover {
+                                    background-color: darken($darkGreen, 10%);
+                                }
+                            }
+
+                            .delete {
+                                background-color: $red;
+
+                                &:hover {
+                                    background-color: darken($red, 10%);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
-.section-addAdmin {
-    background-color: hsla(0, 0%, 0%, 0.7);
+
+.modal {
+    display: flex;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
     width: 100%;
     height: 100%;
-    position: absolute;
-    z-index: 21;
-    top: 0;
-    .addAdmin {
-        overflow: auto;
-        width: 50%;
-        height: 75%;
-        background-color: $bcgw;
-        border-radius: 20px;
-        padding: 40px 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        h2 {
-            color: $darkGreen;
-            font-size: 2.25rem;
-            font-family: $titleFont;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+    align-items: center;
+    justify-content: center;
+
+    .modal-content {
+        background-color: #fefefe;
+        padding: 20px;
+        border-radius: 10px;
+        width: 80%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        MA .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
             font-weight: bold;
+            cursor: pointer;
+
+            &:hover,
+            &:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
         }
+
+        h2 {
+            margin-top: 0;
+            color: $darkGreen;
+        }
+
         form {
-            margin-top: 50px;
-            width: 100%;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            div {
-                width: 80%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin: 10px 0;
-                input {
-                    width: 70%;
-                    height: 35px;
-                    border: solid 1px $darkGreen;
-                    padding: 8px 15px;
+            gap: 15px;
+
+            label {
+                font-weight: bold;
+                color: $darkGreen;
+                margin-top: 10px;
+            }
+
+            input,
+            select,
+            textarea {
+                width: 100%;
+                padding: 8px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+
+                &:focus {
                     outline: none;
-                    &:focus {
-                        outline: none;
-                        &::placeholder {
-                            color: transparent;
-                        }
-                    }
-                }
-                select {
-                    width: 70%;
-                    height: 35px;
-                    border: solid 1px $darkGreen;
-                    padding: 0 14px;
-                    outline: none;
-                    color: grey;
-                    &:focus {
-                        outline: none;
-                        &::placeholder {
-                            color: transparent;
-                        }
-                    }
+                    border-color: $darkGreen;
                 }
             }
-            .button {
-                width: 35%;
-                margin-top: 50px;
-                button {
-                    display: inline-block;
-                    text-decoration: none;
-                    border-radius: 25px;
-                    border: 1px solid #eee;
-                    background-color: #144433;
-                    color: #fff;
-                    font-size: 1rem;
-                    font-weight: bold;
-                    padding: 7px 30px;
-                    letter-spacing: 1px;
-                    transition: transform 0.5s ease-in;
-                    transition: 0.5s;
-                    text-align: center;
-                    &:active {
-                        transform: scale(0.9);
-                    }
-                    &:hover {
-                        background-color: #fff;
-                        color: #144433;
-                        border: solid 1px #144433;
-                    }
-                    &:focus {
-                        outline: none;
-                        &::placeholder {
-                            color: transparent;
-                        }
-                    }
-                }
-                .cancel {
-                    background-color: $red;
-                    color: #fff;
-                    &:hover {
-                        background-color: #fff;
-                        color: $red;
-                        border: solid 1px $red;
-                    }
+
+            textarea {
+                height: 100px;
+                resize: vertical;
+            }
+
+            button[type='submit'] {
+                padding: 10px;
+                background-color: $darkGreen;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                transition: 0.3s;
+                margin-top: 20px;
+
+                &:hover {
+                    background-color: darken($darkGreen, 10%);
                 }
             }
         }
     }
+}
+
+.preview-image {
+    max-width: 100px;
+    max-height: 100px;
+    object-fit: contain;
+    margin-top: 5px;
 }
 </style>
