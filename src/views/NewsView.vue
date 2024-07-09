@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>最新消息管理</h1>
-                <button>+ 新增最新消息</button>
+                <button>+ 新增消息</button>
             </div>
             <table>
                 <thead>
@@ -17,7 +17,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in news" :key="item.n_no">
+                    <tr v-for="item in responseData" :key="item.n_no">
                         <td>{{ item.n_time }}</td>
                         <td>
                             <div class="pic">
@@ -39,6 +39,47 @@
                 </tbody>
             </table>
         </div>
+        <div class="lightBoxWraper">
+            <div class="lightBox">
+                <div class="inputFeld">
+                    <h2 v-show="addSwitch == true">新增消息</h2>
+                    <h2 v-show="editSwitch">修改消息</h2>
+                    <form action="#">
+                        <div>
+                            <span>消息編號:</span>
+                            <input type="number" name="n_no" v-model="n_no">
+                        </div>
+                        <div>
+                            <span>消息標題:</span>
+                            <input type="text" v-model="n_topic" name="n_topic">
+                        </div>
+                        <div>
+                            <span>消息圖片:</span>
+                            <input type="file" name="n_img" @change="getfile($event)">
+                        </div>
+                        <div>
+                            <span>消息發布日期:</span>
+                            <input type="date" v-model="n_time" name="n_time">
+                        </div>
+                        <div>
+                            <span>消息內文:</span>
+                            <input type="text" v-model="n_article" name="n_article">
+                        </div>
+                        <div>
+                            <span>消息外部連結:</span>
+                            <input type="text" v-model="n_link" name="n_link">
+                        </div>
+                        <div>
+                            <span>消息狀態:</span>
+                            <select name="n_status" >
+                                <option value="1">上架</option>
+                                <option value="0">下架</option>
+                            </select>
+                        </div> 
+                    </form>
+                </div>
+            </div>
+         </div>
     </section>
 </template>
 
@@ -46,50 +87,27 @@
 export default {
     data() {
         return {
-            news: [
-                {
-                    n_no: '1',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    n_img: 'newsimg1.png',
-                    n_time: '2024-06-04',
-                    n_article: '食農教育法',
-                    n_link: '111',
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: '2',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    n_img: 'newsimg1.png',
-                    n_time: '2024-06-04',
-                    n_article: '食農教育法',
-                    n_link: '111',
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                },
-                {
-                    n_no: '3',
-                    n_topic: '永續食農 傳承共榮，第一屆國家食農教育傑出貢獻獎啟動徵選',
-                    n_img: 'newsimg1.png',
-                    n_time: '2024-06-04',
-                    n_article: '食農教育法',
-                    n_link: '111',
-                    n_status: '',
-                    isActive: false,
-                    isClick: false
-                }
-            ]
+            responseData: [],
+            addSwitch:true,
         }
     },
     methods: {
-        // toggleStatus(user) {
-        //     user.status = user.status === '正常' ? '停用' : '正常'
-        // },
         parsePic(file) {
             return new URL(`../assets/image/${file}`, import.meta.url).href
+        },
+        fetchData() {
+            fetch(`http://localhost/php_G4/newsList.php`,{
+                method:'POST',
+            })
+            .then((res)=>res.json())
+            .then((json)=>{
+                console.log(json);
+                this.responseData = json['data']['list']
+            })
         }
+    },
+    mounted () {
+        this.fetchData();
     }
 }
 </script>
@@ -217,6 +235,34 @@ export default {
                 }
             }
         }
+    }
+    .lightBoxWraper {
+        display: none;
+        position:fixed;
+        width: 100vw;
+        height: 100vh;
+        background-color: hsla(0, 0%, 0%, 0.7);
+        z-index: 20;
+        top:0%;
+        .lightBox {
+            &::-webkit-scrollbar{
+                width: 1px;
+            }
+        }
+        overflow: auto;
+        width: 90%;
+        height: 90%;
+        background-color:$bcgw;
+        border-radius:10px;
+        padding:30px 20px;
+        display:flex;
+        top:50%;
+        left:50%;
+        transform: translate(-50%,-50%);
+        z-index: 10;
+    }
+    .inputFeld {
+
     }
 }
 </style>

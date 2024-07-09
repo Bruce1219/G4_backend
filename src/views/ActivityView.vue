@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>活動管理</h1>
-                <button @click="addActivity($event)">+ 新增活動</button>
+                <button @click="addActivity($event)">+ 新增活動</button >
             </div>
             <div class="wrap-table">
                 <table>
@@ -26,7 +26,7 @@
                             <td>{{ item.a_no }}</td>
                             <td>
                                 <div class="pic">
-                                    <img :src="parsePic(item.p_img)" alt="最新消息圖片" />
+                                    <img :src="parsePic(item.a_img)" alt="最新消息圖片" />
                                 </div>
                             </td>
                             <td>{{ item.a_name }}</td>
@@ -52,8 +52,8 @@
     <div
         class="section-addActivity"
         v-show="addSwitch === true || editSwitch === true"
-    >
-        <div class="addActivity" @click.stop>
+       >
+        <div class="addActivity" @click.stop  ref="addLightBox">
             <h2 v-show="addSwitch">新增活動</h2>
             <h2 v-show="editSwitch">修改活動</h2>
             <form action="#">
@@ -74,11 +74,11 @@
                 </div>
                 <div>
                     <span>活動名稱 : </span>
-                    <input type="text" name="a_name" placeholder="輸入活動名稱" v-model="a_name" />
+                    <input type="text" name="a_name"  v-model="a_name" />
                 </div>
                 <div>
                     <span>活動地址 : </span>
-                    <input type="text" name="a_loc" placeholder="活動地址" v-model="a_loc" />
+                    <input type="text" name="a_loc" v-model="a_loc" />
                 </div>
                 <div>
                     <span>報名上限 : </span>
@@ -108,31 +108,31 @@
                 </div>
                 <div>
                     <span>活動資訊: </span>
-                    <textarea name="a_info" v-model="a_info"></textarea>
+                    <textarea name="a_info" v-model="a_info"  rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動資訊1: </span>
-                    <textarea name="a_info1" v-model="a_info1"></textarea>
+                    <textarea name="a_info1" v-model="a_info1" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動資訊2: </span>
-                    <textarea name="a_info2" v-model="a_info2"></textarea>
+                    <textarea name="a_info2" v-model="a_info2" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動資訊3: </span>
-                    <textarea name="a_info3" v-model="a_info3"></textarea>
+                    <textarea name="a_info3" v-model="a_info3" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動須知1: </span>
-                    <textarea name="a_rules1" v-model="a_rules1"></textarea>
+                    <textarea name="a_rules1" v-model="a_rules1" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動須知2: </span>
-                    <textarea name="a_rules2" v-model="a_rules2"></textarea>
+                    <textarea name="a_rules2" v-model="a_rules2" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動須知3: </span>
-                    <textarea name="a_rules3" v-model="a_rules3"></textarea>
+                    <textarea name="a_rules3" v-model="a_rules3" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動狀態:</span>
@@ -154,9 +154,9 @@
     </div>
     <div class="section-addActivity" v-show="deleteSwitch === true" @click="deleteEvent($event)"  >
         <div class="delete-alert addActivity"  @click.stop>
-            <h2>確定要刪除?</h2>
+            <h2>確定要刪除!!</h2>
             <div class="button">
-            <button type="button" class=" cancel" @click="deleteEvent($event)">取消</button>
+            <button type="button" class="cancel" @click="deleteEvent($event)">取消</button>
             <button class=" delete confirm" @click="deleteConfirm()">刪除</button>
         </div>
     </div>
@@ -194,6 +194,7 @@ export default {
             a_rules3: '',
             a_status: '',
             file:null,
+            oldFileName:'',
         }
     },
     methods: {
@@ -203,6 +204,7 @@ export default {
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
             //新增情況
+            this.scrollToTop();
             if (this.addSwitch === false) {
                 this.addSwitch = true;
                 this.a_no = this.activities.length+1
@@ -231,13 +233,13 @@ export default {
                 this.a_status = ''
             }
         },
+        scrollToTop() {
+      this.$refs.addLightBox.scrollTop = 0;
+    },
         confirm() {
-            // let formData = new FormData();
-            // formData.append("a",this.file)
-            // let fileData =  JSON.stringify(formData);
-            // console.log(typeof data);
-            this.fetchImage();
-            const url = `http://localhost/php_G4/addEvents.php`
+            this.updateImage() ;
+            // const url = `http://localhost/php_G4/addEvents.php`
+            const url = `../../php_G4/addEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -263,15 +265,12 @@ export default {
             }
             fetch(url, {
                 method: 'POST',
-                // body:fileData,
                 body:JSON.stringify(body),
                 headers:{'content-type':'multipart/form-data"'}
             })
                 .then((res) => res.json())
                 .then((json) => {
-                    // 檢查是否有 this.data
                     this.activities = json
-                    console.log('TEST: ' + this.activities)
                     if (
                         this.data != null ||
                         this.a_no != null ||
@@ -297,13 +296,13 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
-        },fetchImage () {
-            let formData = new FormData();
-            formData.append("a_img",this.file)
-            // let fileData =  JSON.stringify(formData);
-            fetch(`http://localhost/php_G4/addEventImage.php`,{
+        },deleteImage () {
+            let body = {
+                oldFileName : this.oldFileName
+            }
+            fetch(`http://localhost/php_G4/deleteEventImage.php`,{
                 method:'POST',
-                body:formData,
+                body:JSON.stringify(body),
             })
             .then((res) =>res.json)
             .then((json)=>{
@@ -311,21 +310,34 @@ export default {
             })
 
         },
+        updateImage() {
+            let formData = new FormData();
+            formData.append('a_img',this.file)//建立新的formdata
+            // const url = `http://localhost/php_G4/addEvents.php`
+            const url = `../../php_G4/addEventImage.php`
+            fetch(url,{
+                method:'POST',
+                body:formData,
+            })
+            .then((res)=>res.json)
+            .then((json)=>{
+                this.activities = json;
+            })
+        },
         getfile(event) {
             this.file = event.target.files[0]
             this.a_img = this.file.name
-            console.log(this.a_img)
-            console.log(this.file)
-            console.log(typeof this.file)
         },
         editEvent(event,index) {
             event.stopPropagation()
+            this.scrollToTop();
             if (this.editSwitch === false) {
                 this.editSwitch = true
                 //編輯把值帶入input裡面
                 this.a_no = this.activities[index].a_no
                 this.c_no = this.activities[index].c_no
                 this.a_name = this.activities[index].a_name
+                this.a_img = this.activities[index].a_img
                 this.a_loc = this.activities[index].a_loc
                 this.a_max = this.activities[index].a_max
                 this.a_fee = this.activities[index].a_fee
@@ -343,6 +355,8 @@ export default {
                 this.a_rules2 = this.activities[index].a_rules2
                 this.a_rules3 = this.activities[index].a_rules3
                 this.a_status = this.activities[index].a_status
+                //取得舊檔案名稱
+                this.oldFileName = '../G4_backend/src/assets/image/'+this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.editSwitch = false
@@ -381,6 +395,8 @@ export default {
                 })
         },
         editConfirm() {
+            this.updateImage();
+            this.deleteImage();
             const url = `http://localhost/php_G4/editEvents.php`
             let body = {
                 a_no: this.a_no,
@@ -403,7 +419,8 @@ export default {
                 a_rules1: this.a_rules1,
                 a_rules2: this.a_rules2,
                 a_rules3: this.a_rules3,
-                a_status: this.a_status
+                a_status: this.a_status,
+                oldFileName:this.oldFileName
             }
             fetch(url, {
                 method: 'POST',
@@ -434,8 +451,6 @@ export default {
                     } else {
                         alert(this.data.msg)
                     }
-
-                    console.log(this.data)
                 })
                 .catch((error) => {
                     console.error('Error:', error)
@@ -443,7 +458,6 @@ export default {
         },
         deleteEvent(event,index) {
             event.stopPropagation();
-            console.log(this.deleteSwitch)
             if (this.deleteSwitch === false) {
                 this.deleteSwitch = true
                 //編輯把值帶入input裡面
@@ -466,7 +480,6 @@ export default {
                 .then((res) => res.json())
                 .then((json) => {
                     this.data = json
-                    console.log(this.data)
                     if (
                         this.data != null ||
                         this.a_no != null 
@@ -541,36 +554,36 @@ export default {
             margin-top: 30px;
             table {
                 width: 100%;
-                // margin-top: 30px;
-                // border: solid 1px $darkGreen;
                 background-color: #fff;
                 border-collapse: separate;
                 border-spacing: 0;
                 thead {
-                    line-height: 3;
                     text-align: center;
                     font-weight: bold;
-                    border-collapse: separate;
-                    border-radius: 20px;
+                    background-color:$darkGreen;
                 }
                 tr {
-                    border-collapse: separate;
-                    border-radius: 20px;
-                    vertical-align: middle; /* 垂直居中對齊 */
+                    display: flex;
+                    justify-content: center;
+                &:nth-child(even) {
+                    background-color:#f8f8f8;
+                }
                 }
                 th {
-                    color: #144433;
-                    font-size: 16px;
+                    width: 10%;
+                    color:#fff;
+                    font-family: Arial, sans-serif;
+                    font-size:15px;
                     padding: 10px;
                     border: solid 1px $darkGreen;
+                    border-top-left-radius:20px ;
+                    border-top-right-radius: 20px;
                 }
                 td {
-                    font-size: 16px;
-                    margin: 0 3px;
-                    line-height: 3;
-                    text-align: center;
-                    border: solid 1px $darkGreen;
-                    vertical-align: middle; /* 垂直居中對齊 */
+                    width: 10%;
+                    font-size: 14px;
+                    text-align: center;                    border-bottom: solid 1px #ddd;
+                    box-sizing: border-box;
                 }
                 /*第一欄第一列：左上*/
                 tr:first-child th:first-child {
@@ -612,7 +625,6 @@ export default {
                     // width: 20px;
                     color: #fff;
                     text-decoration: none;
-                    background-color: $darkGreen;
                     border: none;
                     padding: 7px 20px;
                     margin: 5px 10px;
@@ -621,6 +633,9 @@ export default {
                     &:hover {
                         background-color: $red;
                     }
+                }
+                .delete {
+                    background-color: red;
                 }
             }
         }
@@ -638,11 +653,11 @@ export default {
             width: 1px;
         }
         overflow: auto;
-        width: 80%;
-        height: 80%;
+        width: 90%;
+        height: 90%;
         background-color: $bcgw;
         border-radius: 20px;
-        padding: 40px 0;
+        padding: 30px 0;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -658,7 +673,7 @@ export default {
             font-weight: bold;
         }
         form {
-            margin-top: 50px;
+            margin-top: 30px;
             width: 100%;
             display: flex;
             flex-direction: column;
@@ -668,47 +683,94 @@ export default {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                margin: 10px 0;
+                margin: 20px 0;
+                span{
+                    color:#144433;
+
+                }
                 input {
-                    width: 70%;
-                    height: 35px;
-                    border: solid 1px $darkGreen;
-                    padding: 8px 15px;
+                    width: 90%;
+                    height: 30px;
+                    border:1px solid #ddd;
+                    background-color:#fff;
+                    padding: 20px;
+                    border-radius:5px;
                     outline: none;
                     &:focus {
-                        outline: none;
+                        outline:1px solid $lightGreen;
                         &::placeholder {
                             color: transparent;
                         }
                     }
+                }input[type="file"] {
+                    border:none;
+                    height: 35px;
+                    padding: 0;
+                    background-color: transparent;
+                    color:#144433;
+                    &:focus {
+                        outline:none;
+                }
+                    &::file-selector-button{
+                        background-color: $lightGreen;
+                        color:#fff;
+                        border:none;
+                        padding:5px;
+                        border-radius:5px;
+                     
+                    }
                 }
                 select {
-                    width: 70%;
+                    width: 90%;
                     height: 35px;
-                    border: solid 1px $darkGreen;
+                    border: solid 1px #ddd;
+                    border-radius:5px;
                     padding: 0 14px;
                     outline: none;
                     color: grey;
                     &:focus {
-                        outline: none;
+                        outline:1px solid $lightGreen;
                         &::placeholder {
                             color: transparent;
                         }
                     }
                 }
+                input[type="datetime-local"] {
+                    width: 50%;
+                    &:focus {
+                        outline:1px solid $lightGreen;
+                }
+                }
+                input[type="date"] {
+                    width: 45%;
+                    &:focus {
+                        outline:1px solid $lightGreen;
+                }
+                }
+                textarea {
+                    border-radius: 5px;
+                    text-decoration: none;
+                    border:1px solid #ddd;
+                    resize: none;
+                    padding:10px;
+                    &:focus {
+                        outline:1px solid $lightGreen;
+                }
             }
-            .button {
+    }
+    .button {
                 width: 35%;
-                margin-top: 50px;
+                margin-top: 30px;
                 button {
                     display: inline-block;
                     text-decoration: none;
-                    border-radius: 25px;
+                    border-radius: 5px;
                     border: 1px solid #eee;
                     background-color: #144433;
                     color: #fff;
                     font-size: 1rem;
                     font-weight: bold;
+                    width: 40%;
                     padding: 7px 30px;
                     letter-spacing: 1px;
                     transition: transform 0.5s ease-in;
@@ -738,8 +800,61 @@ export default {
                         border: solid 1px $red;
                     }
                 }
-            }
         }
-    }
 }
+}
+.delete-alert {
+    width: 30%;
+    height: 30%;
+    h2{
+        color:#cc3300;
+    }
+    .button {
+                width: 100%;
+                text-align: center;
+                margin-top: 30px;
+                button {
+                    display: inline-block;
+                    text-decoration: none;
+                    border-radius: 5px;
+                    border: 1px solid #eee;
+                    background-color: #144433;
+                    color: #fff;
+                    font-size: 1rem;
+                    font-weight: bold;
+                    width: 30%;
+                    padding: 7px 20px;
+                    letter-spacing: 1px;
+                    transition: transform 0.5s ease-in;
+                    transition: 0.5s;
+                    text-align: center;
+                    &:active {
+                        transform: scale(0.9);
+                    }
+                    &:hover {
+                        background-color: #fff;
+                        color: #144433;
+                        border: solid 1px #144433;
+                    }
+                    &:focus {
+                        outline: none;
+                        &::placeholder {
+                            color: transparent;
+                        }
+                    }
+                }
+                .cancel {
+                    background-color: $red;
+                    color: #fff;
+                    &:hover {
+                        background-color: #fff;
+                        color: $red;
+                        border: solid 1px $red;
+                    }
+                }
+        }
+
+}
+}
+
 </style>
