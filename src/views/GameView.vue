@@ -1,12 +1,10 @@
 <template>
     <section class="section">
         <div class="container">
-            <!-- 頁面標題和新增按鈕 -->
             <div>
                 <h1>食農問答管理</h1>
                 <button @click="showAddModal">+ 新增題目</button>
             </div>
-            <!-- 問題列表表格 -->
             <div class="table-container">
                 <table>
                     <thead>
@@ -18,7 +16,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 遍歷並顯示所有問題 -->
                         <tr v-for="question in questions" :key="question.no">
                             <td>{{ question.no }}</td>
                             <td>{{ question.question }}</td>
@@ -33,21 +30,17 @@
             </div>
         </div>
 
-        <!-- 新增/編輯題目的彈出視窗 -->
         <div class="modal" v-if="showAddQuestionModal || showEditQuestionModal" @click="closeModalIfBackgroundClicked">
             <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
                 <form @submit.prevent="saveQuestion">
-                    <!-- 問題題號輸入 -->
                     <label for="questionNo">問題題號</label>
                     <input type="text" id="questionNo" v-model="currentQuestion.no" required :disabled="showEditQuestionModal" />
 
-                    <!-- 問題題目輸入 -->
                     <label for="question">問題題目</label>
                     <input type="text" id="question" v-model="currentQuestion.question" required />
 
-                    <!-- 正確答案選項選擇 -->
                     <label for="answer">正確答案選項</label>
                     <select id="answer" v-model="currentQuestion.answer" required>
                         <option value="A">A</option>
@@ -56,30 +49,23 @@
                         <option value="D">D</option>
                     </select>
 
-                    <!-- 正確答案文字輸入 -->
                     <label for="correctAnswer">正確答案文字</label>
                     <input type="text" id="correctAnswer" v-model="currentQuestion.correctAnswer" required />
 
-                    <!-- 解答解釋輸入 -->
                     <label for="explanation">解答解釋</label>
                     <textarea id="explanation" v-model="currentQuestion.explanation" required></textarea>
 
-                    <!-- 解答圖片上傳 -->
                     <label for="answer_image">解答圖片</label>
                     <input type="file" id="answer_image" @change="handleImageUpload($event, 'answer')" />
-                    <input type="text" v-model="currentQuestion.answer_image" placeholder="圖片檔名" />
-
-                    <!-- 選項內容和圖片輸入 -->
+                    
                     <template v-for="option in currentQuestion.options" :key="option.key">
                         <label :for="'option_' + option.key">{{ option.key }}選項內容</label>
                         <input :id="'option_' + option.key" v-model="option.text" required />
 
                         <label :for="'option_' + option.key + '_image'">{{ option.key }}選項圖片</label>
                         <input type="file" :id="'option_' + option.key + '_image'" @change="handleImageUpload($event, option.key)" />
-                        <input type="text" v-model="option.img" placeholder="圖片檔名" />
                     </template>
 
-                    <!-- 提交按鈕 -->
                     <button type="submit">{{ modalAction }}</button>
                 </form>
             </div>
@@ -96,7 +82,9 @@ export default {
             showEditQuestionModal: false,
             modalTitle: '',
             modalAction: '',
-            currentQuestion: null
+            currentQuestion: null,
+            uploadQueue: [],
+            isUploading: false
         }
     },
     methods: {
@@ -167,6 +155,11 @@ export default {
             this.showAddQuestionModal = true
         },
         async saveQuestion() {
+            if (this.isUploading || this.uploadQueue.length > 0) {
+                alert('請等待所有圖片上傳完成後再保存。')
+                return
+            }
+
             try {
                 const url = 'http://localhost/php_g4/get_question.php'
                 const response = await fetch(url, {
@@ -237,23 +230,71 @@ export default {
             this.modalTitle = ''
             this.modalAction = ''
             this.currentQuestion = this.getEmptyQuestion()
-        },
-        handleImageUpload(event, type) {
-            const file = event.target.files[0]
-            if (file) {
-                if (type === 'answer') {
-                    this.currentQuestion.answer_image = file.name
-                } else {
-                    const option = this.currentQuestion.options.find((opt) => opt.key === type)
-                    if (option) {
-                        option.img = file.name
-                    }
-                }
-            }
+            this.uploadQueue = []
+            this.isUploading = false
         },
         closeModalIfBackgroundClicked(event) {
             if (event.target.className === 'modal') {
                 this.closeModal()
+            }
+        },
+        handleImageUpload(event, type) {
+            const file = event.target.files[0]
+            if (file) {
+                this.uploadQueue.push({ file, type })
+                this.processUploadQueue()
+            }
+        },
+        async processUploadQueue() {
+            if (this.isUploading || this.uploadQueue.length === 0) {
+                return
+            }
+
+            this.isUploading = true
+            const { file, type } = this.uploadQueue.shift()
+
+            let formData = new FormData()
+            formData.append(type === 'answer' ? 'q_explainimg_img' : 'q_img', file)
+
+            try {
+                const url = 'http://localhost/php_G4/questionsImg.php';
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+
+                const result = await response.json()
+                console.log('Server response:', result)
+
+                if (result.code === 200) {
+                    const uploadedFileName =
+                        type === 'answer'
+                            ? result.data.q_explainimg_img.fileName
+                            : result.data.q_img.fileName
+                    if (type === 'answer') {
+                        this.currentQuestion.answer_image = uploadedFileName
+                    } else {
+                        const option = this.currentQuestion.options.find((opt) => opt.key === type)
+                        if (option) {
+                            option.img = uploadedFileName
+                        }
+                    }
+                    console.log(`圖片上傳成功: ${uploadedFileName}`)
+                } else {
+                    throw new Error(result.msg || '圖片上傳失敗')
+                }
+            } catch (error) {
+                console.error('圖片上傳錯誤:', error)
+                alert(`圖片 ${file.name} 上傳失敗，請稍後再試。錯誤詳情：${error.message}`)
+            } finally {
+                this.isUploading = false
+                if (this.uploadQueue.length > 0) {
+                    this.processUploadQueue()
+                }
             }
         }
     },
@@ -364,7 +405,8 @@ $red: #ff4444;
                                 text-align: center;
                             }
 
-                            .edit, .delete {
+                            .edit,
+                            .delete {
                                 color: #fff;
                                 border: none;
                                 padding: 5px 10px;
