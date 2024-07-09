@@ -75,8 +75,8 @@ export default {
                     collapseId: 'home-collapse',
                     links: [
                         { route: '/indexsidebar/farm', text: '農場' },
-                        { route: '/indexsidebar/news', text: '最新消息' },
-                        { route: '/indexsidebar/chatbox', text: '客服機器人' }
+                        { route: '/indexsidebar/news', text: '最新消息' }
+                        // { route: '/indexsidebar/chatbox', text: '客服機器人' }
                     ]
                 },
                 {
@@ -121,8 +121,8 @@ export default {
                     target: '#back-collapse',
                     collapseId: 'back-collapse',
                     links: [
-                        { route: '/indexsidebar/admin', text: '管理員' },
-                        { route: '/indexsidebar/coupon', text: '優惠卷' }
+                        { route: '/indexsidebar/admin', text: '管理員' }
+                        // { route: '/indexsidebar/coupon', text: '優惠卷' }
                     ]
                 }
             ]
