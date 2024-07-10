@@ -165,7 +165,7 @@ export default {
             }
         },
         loadCurrentAccount() {
-            const user = localStorage.getItem('currentUser')
+            const user = localStorage.getItem('currentAdmin')
             if (user) {
                 const parsedUser = JSON.parse(user)
                 this.currentAccount = parsedUser.am_account // 使用正確的鍵名
