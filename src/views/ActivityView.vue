@@ -202,7 +202,7 @@ export default {
     },
     methods: {
         parsePic(file) {
-            return new URL(`../images/assets/${file}`, import.meta.url).href
+            return new URL(`../../images/assets/${file}`, import.meta.url).href
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
@@ -394,7 +394,7 @@ export default {
         },
         fetchData() {
             // url=`http://localhost/php_G4/activitiesList.php`
-            url=`../../api/activitiesList.php`
+            let url=`../../api/activitiesList.php`
             fetch(url, {
                 method: 'POST'
                 
