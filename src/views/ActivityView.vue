@@ -202,7 +202,7 @@ export default {
     },
     methods: {
         parsePic(file) {
-            return new URL(`../../images/assets/${file}`, import.meta.url).href
+            return new URL(`../images/assets/${file}`, import.meta.url).href
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
@@ -363,7 +363,7 @@ export default {
                 this.a_rules3 = this.activities[index].a_rules3
                 this.a_status = this.activities[index].a_status
                 //取得舊檔案名稱
-                this.oldFileName = '../../images/assets/'+this.activities[index].a_img
+                this.oldFileName = '../images/assets/'+this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.editSwitch = false
