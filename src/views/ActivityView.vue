@@ -68,9 +68,12 @@
                         <option value="講座">講座</option>
                     </select>
                 </div>
-                <div>
+                <div >
+                    <label  >
                     <span>新增圖片 : </span> 
                     <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" @change="getfile($event)"/>
+                    <span class="fakeBrowBTN">選擇檔案</span> <span>{{ file ? file.name : '沒有選擇任何檔案' }}</span>
+                </label>
                 </div>
                 <div>
                     <span>活動名稱 : </span>
@@ -231,6 +234,7 @@ export default {
                 this.a_rules2 = ''
                 this.a_rules3 = ''
                 this.a_status = ''
+                this.file = null
             }
         },
         scrollToTop() {
@@ -287,7 +291,7 @@ export default {
                     ) {
                         alert('新增成功!')
                         this.addSwitch = false
-                        this.fetchDate()
+                        this.fetchData()
                     } else {
                         alert(this.data.msg)
                     }
@@ -328,6 +332,7 @@ export default {
         editEvent(event,index) {
             event.stopPropagation()
             this.scrollToTop();
+            console.log(this.file)
             if (this.editSwitch === false) {
                 this.editSwitch = true
                 //編輯把值帶入input裡面
@@ -378,9 +383,11 @@ export default {
                 this.a_rules2 = ''
                 this.a_rules3 = ''
                 this.a_status = ''
+                this.oldFileName = ''
+                this.file = null
             }
         },
-        fetchDate() {
+        fetchData() {
             fetch(`http://localhost/php_G4/activitiesList.php`, {
                 method: 'POST'
                 
@@ -393,7 +400,9 @@ export default {
         },
         editConfirm() {
             this.updateImage();
+            if(this.file != null) {
             this.deleteImage();
+            }
             const url = `http://localhost/php_G4/editEvents.php`
             let body = {
                 a_no: this.a_no,
@@ -444,7 +453,7 @@ export default {
                     ) {
                         alert('編輯成功!')
                         this.editSwitch = false
-                        this.fetchDate()
+                        this.fetchData()
                     } else {
                         alert(this.data.msg)
                     }
@@ -458,14 +467,17 @@ export default {
             if (this.deleteSwitch === false) {
                 this.deleteSwitch = true
                 //編輯把值帶入input裡面
-                this.a_no = this.activities[index].a_no
+                this.a_no = this.activities[index].a_no;
+                this.oldFileName = '../G4_backend/src/assets/image/'+this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.deleteSwitch = false
                 this.a_no = ''
+                this.oldFileName = ''
             }
         },
         deleteConfirm () {
+            this.deleteImage();
             const url = `http://localhost/php_G4/deleteEvents.php`
             let body = {
                 a_no: this.a_no,
@@ -483,7 +495,7 @@ export default {
                     ) {
                         alert('刪除成功!')
                         this.deleteSwitch = false
-                        this.fetchDate()
+                        this.fetchData()
                     } else {
                         alert(this.data.msg)
                     }
@@ -494,7 +506,7 @@ export default {
         }
     },
     mounted() {
-        this.fetchDate()
+        this.fetchData()
     }
 }
 </script>
@@ -562,6 +574,7 @@ export default {
                 tr {
                     display: flex;
                     justify-content: center;
+                    vertical-align: middle;
                 &:nth-child(even) {
                     background-color:#f8f8f8;
                 }
@@ -581,6 +594,7 @@ export default {
                     font-size: 14px;
                     text-align: center;                    border-bottom: solid 1px #ddd;
                     box-sizing: border-box;
+                    vertical-align: middle
                 }
                 /*第一欄第一列：左上*/
                 tr:first-child th:first-child {
@@ -681,6 +695,7 @@ export default {
                 justify-content: space-between;
                 align-items: center;
                 margin: 20px 0;
+                position: relative;
                 span{
                     color:#144433;
 
@@ -699,23 +714,27 @@ export default {
                             color: transparent;
                         }
                     }
+            
                 }input[type="file"] {
                     border:none;
                     height: 35px;
                     padding: 0;
                     background-color: transparent;
                     color:#144433;
+                    position:absolute;
+                    opacity: 0;
                     &:focus {
                         outline:none;
                 }
-                    &::file-selector-button{
-                        background-color: $lightGreen;
-                        color:#fff;
+            }
+            .fakeBrowBTN {
+                    background-color: $lightGreen ;
+                    color:#fff;
                         border:none;
                         padding:5px;
                         border-radius:5px;
-                     
-                    }
+                        margin-right:5px;
+                        margin-left:5px;
                 }
                 select {
                     width: 90%;
