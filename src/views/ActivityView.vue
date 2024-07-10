@@ -242,7 +242,8 @@ export default {
     },
         confirm() {
             this.updateImage() ;
-            const url = `http://localhost/php_G4/addEvents.php`
+            // const url = `http://localhost/php_G4/addEvents.php`
+            const url = `../../php_G4/addEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -316,7 +317,9 @@ export default {
         updateImage() {
             let formData = new FormData();
             formData.append('a_img',this.file)//建立新的formdata
-            fetch(`http://localhost/php_G4/addEventImage.php`,{
+            // const url = `http://localhost/php_G4/addEvents.php`
+            const url = `../../php_G4/addEventImage.php`
+            fetch(url,{
                 method:'POST',
                 body:formData,
             })

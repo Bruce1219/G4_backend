@@ -15,7 +15,7 @@
                             <th scope="col">農場名稱</th>
                             <th scope="col">價格</th>
                             <th scope="col">購買單位</th>
-                            <th scope="col">熱門度</th>
+                            <th scope="col">商品類別</th>
                             <th scope="col">操作</th>
                         </tr>
                     </thead>
@@ -30,7 +30,7 @@
                             <td>{{ product.p_popular == '0' ? '熱門商品' : '一般商品' }}</td>
                             <td>
                                 <button @click="editProduct(product)" class="edit">編輯</button>
-                                <button @click="deleteProduct(product.p_no)" class="delete">刪除</button>
+                                <button @click="deleteProduct(product.p_no)"class="delete">刪除</button>
                             </td>
                         </tr>
                     </tbody>
@@ -78,10 +78,14 @@
                     <label for="productDescription">商品描述</label>
                     <textarea id="productDescription" v-model="currentProduct.p_info" required></textarea>
 
-                    <div v-for="(image, index) in currentProduct.p_img" :key="index">
+                    <div v-for="(image, index) in currentProduct.pi_img" :key="index">
                         <label :for="'productImage' + (index + 1)">商品圖片 {{ index + 1 }}</label>
-                        <input type="text" :id="'productImageName' + (index + 1)" v-model="currentProduct.p_img[index]" :placeholder="'輸入圖片 ' + (index + 1) + ' 檔名'" />
-                        <input type="file" :id="'productImageFile' + (index + 1)" @change="handleImageUpload($event, index)" accept="image/*" />
+                        <input
+                            type="file"
+                            :id="'productImageFile' + (index + 1)"
+                            @change="handleImageUpload($event, index)"
+                            accept="image/*"
+                        />
                     </div>
 
                     <button type="submit">{{ modalAction }}</button>
@@ -165,14 +169,14 @@ export default {
                 p_fee: 0,
                 p_unit: '',
                 p_info: '',
-                p_img: ['', '', '', ''],
+                pi_img: ['', '', '', ''],
                 p_popular: '1'
             }
         },
         async editProduct(product) {
             this.currentProduct = {
                 ...product,
-                p_img: product.p_img.length ? product.p_img : ['', '', '', ''],
+                pi_img: product.pi_img.length ? product.pi_img : ['', '', '', ''],
                 p_popular: product.p_popular || '1'
             }
             this.modalTitle = '編輯商品'
@@ -189,9 +193,19 @@ export default {
         },
         async saveProduct() {
             try {
-                this.currentProduct.p_img = this.currentProduct.p_img.filter(
-                    (img) => img.trim() !== ''
-                )
+                const uploadedImages = await this.uploadImages()
+
+                const formData = new FormData()
+
+                for (const key in this.currentProduct) {
+                    if (key !== 'pi_img') {
+                        formData.append(key, this.currentProduct[key])
+                    }
+                }
+
+                uploadedImages.forEach((img, index) => {
+                    formData.append(`pi_img[${index}]`, img)
+                })
 
                 const method = this.showAddProductModal ? 'POST' : 'PUT'
                 const url = this.showAddProductModal
@@ -200,8 +214,7 @@ export default {
 
                 const response = await fetch(url, {
                     method,
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(this.currentProduct)
+                    body: formData
                 })
 
                 if (!response.ok) {
@@ -249,12 +262,57 @@ export default {
                 this.closeModal()
             }
         },
-        handleImageUpload(event, index) {
+        async handleImageUpload(event, index) {
             const file = event.target.files[0]
             if (file) {
-                this.currentProduct.p_img[index] = file.name
+                try {
+                    const formData = new FormData()
+                    formData.append('pi_img', file)
+
+                    const response = await fetch('http://localhost/php_g4/productimg.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`)
+                    }
+
+                    const result = await response.json()
+                    if (result.code === 200) {
+                        this.currentProduct.pi_img[index] = result.data.pi_img[0].fileName
+                    } else {
+                        throw new Error(result.msg || '上傳圖片失敗')
+                    }
+                } catch (error) {
+                    console.error('上傳圖片時發生錯誤:', error)
+                    alert('上傳圖片失敗，請稍後再試。錯誤詳情：' + error.message)
+                }
             }
-        }
+        },
+        async uploadImages() {
+            const uploadedImages = []
+            for (let i = 0; i < this.currentProduct.pi_img.length; i++) {
+                const img = this.currentProduct.pi_img[i]
+                if (img instanceof File) {
+                    const formData = new FormData()
+                    formData.append('pi_img', img)
+                    const response = await fetch('http://localhost/php_g4/productimg.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    if (response.ok) {
+                        const result = await response.json()
+                        if (result.code === 200) {
+                            uploadedImages[i] = result.data.pi_img[0].fileName
+                        }
+                    }
+                } else if (typeof img === 'string' && img.trim() !== '') {
+                    uploadedImages[i] = img
+                }
+            }
+            return uploadedImages
+        },
     },
     async mounted() {
         await this.fetchProducts()
@@ -289,7 +347,7 @@ $red: #ff4444;
         display: flex;
         flex-direction: column;
         height: calc(100vh - 60px);
-        margin-left: 250px;
+        margin-left: 20%;
 
         > div:first-child {
             display: flex;
@@ -364,8 +422,7 @@ $red: #ff4444;
                                 text-align: center;
                             }
 
-                            .edit,
-                            .delete {
+                            .edit, .delete {
                                 color: #fff;
                                 border: none;
                                 padding: 5px 10px;
@@ -420,7 +477,8 @@ $red: #ff4444;
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-        MA .close {
+
+        .close {
             color: #aaa;
             float: right;
             font-size: 28px;

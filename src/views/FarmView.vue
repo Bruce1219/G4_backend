@@ -36,7 +36,11 @@
             </div>
         </div>
 
-        <div class="modal" v-if="showAddFarmModal || showEditFarmModal" @click="closeModalIfBackgroundClicked">
+        <div
+            class="modal"
+            v-if="showAddFarmModal || showEditFarmModal"
+            @click="closeModalIfBackgroundClicked"
+        >
             <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
@@ -50,7 +54,11 @@
                     <label for="farmRegion">農場地區</label>
                     <select id="farmRegion" v-model="currentFarm.data_name" required>
                         <option value="">請選擇農場地區</option>
-                        <option v-for="region in regions" :key="region.city_name" :value="region.city_name">
+                        <option
+                            v-for="region in regions"
+                            :key="region.city_name"
+                            :value="region.city_name"
+                        >
                             {{ region.city_name }}
                         </option>
                     </select>
@@ -62,10 +70,20 @@
                     <textarea id="farmIntro" v-model="currentFarm.f_intro" required></textarea>
 
                     <label for="farmImageFile">上傳農場圖片</label>
-                    <input type="file" id="farmImageFile" @change="handleImageUpload" accept="image/*" />
+                    <input
+                        type="file"
+                        id="farmImageFile"
+                        @change="handleImageUpload($event)"
+                        accept="image/*"
+                    />
 
                     <label for="farmImageName">農場圖片名稱</label>
-                    <input type="text" id="farmImageName" v-model="currentFarm.f_img" placeholder="輸入圖片檔名" />
+                    <input
+                        type="text"
+                        id="farmImageName"
+                        v-model="currentFarm.f_img"
+                        placeholder="輸入圖片檔名"
+                    />
 
                     <label for="farmStatus">農場狀態</label>
                     <select id="farmStatus" v-model="currentFarm.f_status" required>
@@ -90,7 +108,9 @@ export default {
             showEditFarmModal: false,
             modalTitle: '',
             modalAction: '',
-            currentFarm: this.getEmptyFarm()
+            currentFarm: this.getEmptyFarm(),
+            uploadQueue: [],
+            isUploading: false
         }
     },
     computed: {
@@ -199,6 +219,13 @@ export default {
             }
         },
         async deleteFarm(farmNo) {
+            // 先跳出 confirm 確認對話框
+            const confirmation = confirm('你確定要刪除這個農場嗎？')
+
+            if (!confirmation) {
+                return // 如果用戶選擇取消，則直接返回，不執行刪除操作
+            }
+
             try {
                 const response = await fetch(`http://localhost/php_g4/farm.php?id=${farmNo}`, {
                     method: 'DELETE'
@@ -219,6 +246,7 @@ export default {
                 alert('刪除農場失敗，請稍後再試。錯誤詳情：' + error.message)
             }
         },
+
         closeModal() {
             this.showAddFarmModal = false
             this.showEditFarmModal = false
@@ -232,7 +260,51 @@ export default {
         handleImageUpload(event) {
             const file = event.target.files[0]
             if (file) {
+                this.uploadQueue.push({ file })
                 this.currentFarm.f_img = file.name
+                this.processUploadQueue()
+            }
+        },
+        async processUploadQueue() {
+            if (this.isUploading || this.uploadQueue.length === 0) {
+                return
+            }
+
+            this.isUploading = true
+            const { file } = this.uploadQueue.shift()
+
+            let formData = new FormData()
+            formData.append('f_img', file)
+
+            try {
+                const url = 'http://localhost/php_G4/farmImg.php'
+                const response = await fetch(url, {
+                    method: 'POST',
+                    body: formData
+                })
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`)
+                }
+
+                const result = await response.json()
+                console.log('Server response:', result)
+
+                if (result.code === 200) {
+                    const uploadedFileName = result.data.f_img.fileName
+                    this.currentFarm.f_img = uploadedFileName
+                    console.log(`圖片上傳成功: ${uploadedFileName}`)
+                } else {
+                    throw new Error(result.msg || '圖片上傳失敗')
+                }
+            } catch (error) {
+                console.error('圖片上傳錯誤:', error)
+                alert(`圖片 ${file.name} 上傳失敗，請稍後再試。錯誤詳情：${error.message}`)
+            } finally {
+                this.isUploading = false
+                if (this.uploadQueue.length > 0) {
+                    this.processUploadQueue()
+                }
             }
         }
     },
@@ -266,18 +338,18 @@ $red: #ff4444;
         padding: 30px;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 60px);
+        height: 85vh;
         margin-left: 250px;
 
         > div:first-child {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            // margin-bottom: 20px;
 
             h1 {
                 font-size: 2.25em;
-                font-family: $titleFont;
+                font-family: 'Noto Serif TC';
                 font-weight: bold;
                 margin: 0;
             }
@@ -301,55 +373,76 @@ $red: #ff4444;
         }
 
         .table-container {
-            flex-grow: 1;
-            overflow-y: auto;
-            margin-bottom: 20px;
+            //有scrollbar
+            width: 100%;
+            height: 75%;
+            overflow: auto;
+            margin-top: 30px;
 
             table {
                 width: 100%;
                 background-color: #fff;
                 border-collapse: separate;
                 border-spacing: 0;
-                border-radius: 10px;
+                border-radius: 10px 10px 0 0;
                 overflow: hidden;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-
+                // display: grid;
                 thead {
+                    line-height: 3;
+                    text-align: center;
+                    font-weight: bold;
+                    border-collapse: separate;
+                    border-radius: 20px;
                     background-color: $darkGreen;
                     color: #fff;
-                    position: sticky;
-                    top: 0;
-                    z-index: 1;
-
+                    tr {
+                        display: grid;
+                        grid-template-columns: 0.6fr 0.8fr 0.6fr 1fr 1.5fr 0.5fr 0.5fr;
+                    }
                     th {
-                        padding: 15px;
-                        text-align: left;
+                        padding: 10px;
+                        text-align: center;
                         font-weight: bold;
+                        border-collapse: separate;
                     }
                 }
 
                 tbody {
                     tr {
+                        border-collapse: separate;
+                        // border-radius: 20px;
+                        display: grid;
+                        grid-template-columns: 0.6fr 0.8fr 0.6fr 1fr 1.5fr 0.5fr 0.5fr;
+                        align-items: center;
+                        border-bottom: 1px solid #ddd;
+                        text-align: center;
                         &:nth-child(even) {
                             background-color: #f8f8f8;
                         }
 
                         td {
-                            padding: 15px;
-                            border-bottom: 1px solid #ddd;
-
+                            padding: 15px 0;
+                            // line-height: 3;
+                            &:first-child {
+                                text-align: center;
+                            }
                             &:last-child {
                                 text-align: center;
                             }
+                            &:nth-child(5) {
+                                text-align: left;
+                            }
 
-                            .edit, .delete {
+                            .edit,
+                            .delete {
                                 color: #fff;
                                 border: none;
                                 padding: 5px 10px;
                                 border-radius: 3px;
                                 cursor: pointer;
                                 transition: 0.3s;
-                                margin: 0 2px;
+                                margin: 5px;
                             }
 
                             .edit {
@@ -384,7 +477,7 @@ $red: #ff4444;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.7);
     align-items: center;
     justify-content: center;
 
@@ -397,6 +490,9 @@ $red: #ff4444;
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
+        &::-webkit-scrollbar {
+            width: 1px;
+        }
 
         .close {
             color: #aaa;
@@ -404,7 +500,9 @@ $red: #ff4444;
             font-size: 28px;
             font-weight: bold;
             cursor: pointer;
-
+            position: absolute;
+            right: 20px;
+            top: 20px;
             &:hover,
             &:focus {
                 color: #000;
@@ -486,4 +584,3 @@ $red: #ff4444;
     margin-top: 5px;
 }
 </style>
-
