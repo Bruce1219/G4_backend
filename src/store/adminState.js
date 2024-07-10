@@ -10,7 +10,7 @@ export const useAdminStore = defineStore('admin', {
             this.currentUser = user
             if (user) {
                 this.currentAccount = user.am_account // 提取並儲存用戶帳號
-                localStorage.setItem('currentUser', JSON.stringify(user))
+                localStorage.setItem('currentAdmin', JSON.stringify(user))
             } else {
                 this.currentAccount = null // 清空帳號資料
             }
@@ -18,10 +18,10 @@ export const useAdminStore = defineStore('admin', {
         clearCurrentUser() {
             this.currentUser = null
             this.currentAccount = null // 清空帳號資料
-            localStorage.removeItem('currentUser')
+            localStorage.removeItem('currentAdmin')
         },
         loadCurrentUser() {
-            const user = localStorage.getItem('currentUser')
+            const user = localStorage.getItem('currentAdmin')
             if (user) {
                 const parsedUser = JSON.parse(user)
                 this.currentUser = parsedUser
