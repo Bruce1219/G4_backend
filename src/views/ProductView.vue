@@ -242,7 +242,7 @@ export default {
                 const isUpdate = !this.showAddProductModal
                 formData.append('isUpdate', isUpdate ? '1' : '0')
 
-                const url = `${import.meta.env.VITE_API_URL}/product_api.php`
+                const url = `${import.meta.env.VITE_API_URL}/product_api.php.php`
                 // const url = 'http://localhost/php_g4/product_api.php'
                 if (isUpdate) {
                     formData.append('p_no', this.currentProduct.p_no)
