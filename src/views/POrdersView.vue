@@ -80,7 +80,7 @@
 
                 <div class="button-group">
                     <button
-                        v-if="selectedOrder.po_status == 0"
+                        v-if="selectedOrder.po_status == 0 || selectedOrder.po_status == 3"
                         @click="cancelOrder"
                         class="cancel-button"
                     >
