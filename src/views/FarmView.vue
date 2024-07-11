@@ -345,7 +345,7 @@ $red: #ff4444;
         display: flex;
         flex-direction: column;
         height: 85vh;
-        margin-left: 250px;
+        margin-left: 20%;
 
         > div:first-child {
             display: flex;

@@ -131,7 +131,7 @@ $red: #ff4444;
         display: flex;
         flex-direction: column;
         height: calc(100vh - 60px);
-        margin-left: 250px;
+        margin-left: 20%;
 
         > div:first-child {
             display: flex;

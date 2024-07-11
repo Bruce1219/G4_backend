@@ -242,12 +242,11 @@ export default {
     letter-spacing: $letterSpacing;
     font-family: $pFont;
     cursor: default;
-    width: 100%;
     display: flex;
-    flex-direction: row-reverse;
+   margin-left: 20%;
     justify-content: flex-start;
     .container {
-        width: 80%;
+        width: 100%;
         height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
