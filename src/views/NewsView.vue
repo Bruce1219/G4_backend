@@ -136,10 +136,11 @@ export default {
             this.$refs.fileInput.value = '';
         },
         parsePic(file) {
-            return new URL(`../assets/image/${file}`, import.meta.url).href
+            return `${import.meta.env.VITE_FILE_URL}${file}`;
         },
         fetchData() {
-            fetch(`http://localhost/php_G4/newsList.php`, {
+             const url = `${import.meta.env.VITE_API_URL}/newsList.php`;
+            fetch(url, {
                 method: 'POST'
             })
                 .then((res) => res.json())
@@ -168,8 +169,9 @@ export default {
             console.log(this.n_img)
         },
         addNewsConfirm() {
+            const url = `${import.meta.env.VITE_API_URL}/addNews.php`;
             this.updateImage()
-            const url = `http://localhost/php_G4/addNews.php`
+            // const url = `http://localhost/php_G4/addNews.php`
             let body = {
                 n_no: this.n_no,
                 n_link: this.n_link,
@@ -219,7 +221,7 @@ export default {
                 this.n_time = this.responseData[index].n_time
                 this.n_topic = this.responseData[index].n_topic
                 this.oldFileName =
-                    '../G4_backend/src/assets/image/' + this.responseData[index].n_img
+                    `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
             } else {
                 this.editSwitch = false
                 this.n_no = '';
@@ -239,7 +241,8 @@ export default {
                 this.deleteImage()
             }
             console.log(this.n_status)
-            const url = `http://localhost/php_G4/editNews.php`
+            // const url = `http://localhost/php_G4/editNews.php`
+            const url = `${import.meta.env.VITE_API_URL}/editNews.php`;
             let body = {
                 n_no: this.n_no,
                 n_img: this.n_img,
@@ -281,8 +284,7 @@ export default {
                 this.deleteSwitch = true
                 this.n_no = this.responseData[index].n_no
                 this.oldFileName =
-                    '../G4_backend/src/assets/image/' + this.responseData[index].n_img
-                console.log(this.oldFileName)
+                  `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
             } else {
                 this.deleteSwitch = false
                 this.a_no = ''
@@ -290,8 +292,9 @@ export default {
             }
         },
         deleteConfirm() {
+            const url = `${import.meta.env.VITE_API_URL}/deleteNews.php`;
             this.deleteImage()
-            let url = `http://localhost/php_G4/deleteNews.php`
+            // let url = `http://localhost/php_G4/deleteNews.php`
             let body = {
                 n_no: this.n_no
             }
@@ -321,9 +324,10 @@ export default {
             console.log(this.n_img)
         },
         updateImage() {
+            const url = `${import.meta.env.VITE_API_URL}/addNewsImage.php`;
             let formData = new FormData()
             formData.append('n_img', this.file)
-            fetch('http://localhost/php_G4/addNewsImage.php', {
+            fetch(url, {
                 method: 'POST',
                 body: formData
             })
@@ -333,10 +337,11 @@ export default {
                 })
         },
         deleteImage() {
+            const url = `${import.meta.env.VITE_API_URL}/deleteNewsImage.php`;
             let body = {
                 oldFileName: this.oldFileName
             }
-            fetch(`http://localhost/php_G4/deleteNewsImage.php`, {
+            fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(body)
             })
