@@ -222,7 +222,7 @@ export default {
             this.$refs.fileInput.value = '';
         },
         parsePic(file) {
-            return new URL(`../assets/image/${file}`, import.meta.url).href
+            return new URL(`../../images/assets/${file}`, import.meta.url).href
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
@@ -264,7 +264,7 @@ export default {
         confirm() {
             this.updateImage() ;
             // const url = `http://localhost/php_G4/addEvents.php`
-            const url = `../../php_G4/addEvents.php`
+            const url = `../../api/addEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -325,7 +325,9 @@ export default {
             let body = {
                 oldFileName : this.oldFileName
             }
-            fetch(`http://localhost/php_G4/deleteEventImage.php`,{
+            // const url = `http://localhost/php_G4/deleteEventImage.php`
+            const url = `../../api/deleteEventImage.php`
+            fetch(url,{
                 method:'POST',
                 body:JSON.stringify(body),
             })
@@ -338,8 +340,8 @@ export default {
         updateImage() {
             let formData = new FormData();
             formData.append('a_img',this.file)//建立新的formdata
-            // const url = `http://localhost/php_G4/addEvents.php`
-            const url = `../../php_G4/addEventImage.php`
+            // const url = `http://localhost/php_G4/addEventImage.php`
+            const url = `../../api/addEventImage.php`
             fetch(url,{
                 method:'POST',
                 body:formData,
@@ -382,7 +384,7 @@ export default {
                 this.a_rules3 = this.activities[index].a_rules3
                 this.a_status = this.activities[index].a_status
                 //取得舊檔案名稱
-                this.oldFileName = '../G4_backend/src/assets/image/'+this.activities[index].a_img
+                this.oldFileName = '../images/assets/'+this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.editSwitch = false
@@ -412,7 +414,9 @@ export default {
             }
         },
         fetchData() {
-            fetch(`http://localhost/php_G4/activitiesList.php`, {
+            // url=`http://localhost/php_G4/activitiesList.php`
+            let url=`../../api/activitiesList.php`
+            fetch(url, {
                 method: 'POST'
                 
             })
@@ -427,7 +431,8 @@ export default {
             if(this.file != null) {
             this.deleteImage();
             }
-            const url = `http://localhost/php_G4/editEvents.php`
+            // const url = `http://localhost/php_G4/editEvents.php`
+            const url = `../../api/editEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -492,7 +497,7 @@ export default {
                 this.deleteSwitch = true
                 //編輯把值帶入input裡面
                 this.a_no = this.activities[index].a_no;
-                this.oldFileName = '../G4_backend/src/assets/image/'+this.activities[index].a_img
+                this.oldFileName = '../../images/assets/'+this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.deleteSwitch = false
@@ -502,7 +507,8 @@ export default {
         },
         deleteConfirm () {
             this.deleteImage();
-            const url = `http://localhost/php_G4/deleteEvents.php`
+            // const url = `http://localhost/php_G4/deleteEvents.php`
+            const url = `../../api/deleteEvents.php`
             let body = {
                 a_no: this.a_no,
             }

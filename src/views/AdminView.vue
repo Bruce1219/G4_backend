@@ -170,7 +170,7 @@ export default {
             }
         },
         loadCurrentAccount() {
-            const user = localStorage.getItem('currentUser')
+            const user = localStorage.getItem('currentAdmin')
             if (user) {
                 this.currentUser = JSON.parse(user)
             }
