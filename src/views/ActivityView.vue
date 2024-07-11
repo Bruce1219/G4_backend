@@ -222,7 +222,7 @@ export default {
             this.$refs.fileInput.value = '';
         },
         parsePic(file) {
-            return new URL(`../../images/assets/${file}`, import.meta.url).href
+            return `${import.meta.env.VITE_FILE_URL}event-images/${file}`;
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
@@ -264,7 +264,7 @@ export default {
         confirm() {
             this.updateImage() ;
             // const url = `http://localhost/php_G4/addEvents.php`
-            const url = `../../api/addEvents.php`
+            const url = `${import.meta.env.VITE_API_URL}/addEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -326,7 +326,7 @@ export default {
                 oldFileName : this.oldFileName
             }
             // const url = `http://localhost/php_G4/deleteEventImage.php`
-            const url = `../../api/deleteEventImage.php`
+            const url = `${import.meta.env.VITE_API_URL}/deleteEventImage.php`
             fetch(url,{
                 method:'POST',
                 body:JSON.stringify(body),
@@ -340,8 +340,8 @@ export default {
         updateImage() {
             let formData = new FormData();
             formData.append('a_img',this.file)//建立新的formdata
-            // const url = `http://localhost/php_G4/addEventImage.php`
-            const url = `../../api/addEventImage.php`
+            const url = `${import.meta.env.VITE_API_URL}/addEventImage.php`
+            // const url = `../../api/addEventImage.php`
             fetch(url,{
                 method:'POST',
                 body:formData,
@@ -384,7 +384,7 @@ export default {
                 this.a_rules3 = this.activities[index].a_rules3
                 this.a_status = this.activities[index].a_status
                 //取得舊檔案名稱
-                this.oldFileName = '../images/assets/'+this.activities[index].a_img
+                this.oldFileName = `${import.meta.env.VITE_API_URL}/${this.activities[index].a_img}`
             } else {
                 //關閉時，重置
                 this.editSwitch = false
@@ -415,7 +415,8 @@ export default {
         },
         fetchData() {
             // url=`http://localhost/php_G4/activitiesList.php`
-            let url=`../../api/activitiesList.php`
+            // let url=`../../api/activitiesList.php`
+            const url = `${import.meta.env.VITE_API_URL}/activitiesList.php`
             fetch(url, {
                 method: 'POST'
                 
@@ -432,7 +433,8 @@ export default {
             this.deleteImage();
             }
             // const url = `http://localhost/php_G4/editEvents.php`
-            const url = `../../api/editEvents.php`
+            // const url = `../../api/editEvents.php`
+            const url = `${import.meta.env.VITE_API_URL}/editEvents.php`
             let body = {
                 a_no: this.a_no,
                 c_no: this.c_no,
@@ -508,7 +510,8 @@ export default {
         deleteConfirm () {
             this.deleteImage();
             // const url = `http://localhost/php_G4/deleteEvents.php`
-            const url = `../../api/deleteEvents.php`
+            // const url = `../../api/deleteEvents.php`
+            const url = `${import.meta.env.VITE_API_URL}/deleteEvents.php`
             let body = {
                 a_no: this.a_no,
             }
