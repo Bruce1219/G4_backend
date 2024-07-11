@@ -64,7 +64,8 @@ export default {
             try {
                 const store = useAdminStore() // 獲取 Pinia store 的實例
 
-                const url = `http://localhost/php_g4/admin.php`
+                // const url = `http://localhost/php_g4/admin.php`//本地
+                const url = `${import.meta.env.VITE_API_URL}/admin.php` //部屬
                 let body = {
                     acc: this.acc,
                     psw: this.psw
