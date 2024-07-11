@@ -222,7 +222,7 @@ export default {
             this.$refs.fileInput.value = '';
         },
         parsePic(file) {
-            return `${import.meta.env.VITE_FILE_URL}${file}`;
+            return `${import.meta.env.VITE_FILE_URL}event-images/${file}`;
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
