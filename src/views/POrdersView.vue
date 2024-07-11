@@ -105,7 +105,8 @@ export default {
     methods: {
         fetchOrders() {
             console.log('Fetching orders...')
-            fetch('http://localhost/php_g4/back_productOrders.php', {
+            // url='http://localhost/php_g4/back_productOrders.php'
+            fetch(`${import.meta.env.VITE_API_URL}/back_productOrders.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -133,7 +134,8 @@ export default {
 
         viewOrder(po_no) {
             console.log('Viewing order:', po_no)
-            fetch('http://localhost/php_g4/back_productOrders.php', {
+             // url='http://localhost/php_g4/back_productOrders.php'
+            fetch(`${import.meta.env.VITE_API_URL}/back_productOrders.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -165,7 +167,8 @@ export default {
 
             if (confirm('確定要註銷訂單嗎？')) {
                 console.log('Cancelling order:', this.selectedOrder.po_no)
-                fetch('http://localhost/php_g4/back_productOrders.php', {
+                // url='http://localhost/php_g4/back_productOrders.php'
+                fetch(`${import.meta.env.VITE_API_URL}/back_productOrders.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -199,7 +202,7 @@ export default {
 
         updateOrderStatus(order) {
             console.log('Updating order status:', order.po_no, order.po_status)
-            fetch('http://localhost/php_g4/back_productOrders.php', {
+            fetch(`${import.meta.env.VITE_API_URL}/back_productOrders.php`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
