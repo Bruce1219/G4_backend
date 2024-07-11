@@ -84,14 +84,15 @@ export default {
             modalAction: '',
             currentQuestion: null,
             uploadQueue: [],
-            isUploading: false
+            isUploading: false,
+            pendingUploads: 0
         }
     },
     methods: {
         async fetchQuestions() {
             try {
-                //const url = 'http://localhost/php_g4/get_question.php'
-                const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                const url = `${import.meta.env.VITE_API_URL}/get_question.php`;
+                //const url = 'http://localhost/php_g4/get_question.php';
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -156,14 +157,16 @@ export default {
             this.showAddQuestionModal = true
         },
         async saveQuestion() {
-            if (this.isUploading || this.uploadQueue.length > 0) {
-                alert('請等待所有圖片上傳完成後再保存。')
-                return
+            if (this.uploadQueue.length > 0) {
+                this.pendingUploads = this.uploadQueue.length;
+                this.processUploadQueue();
             }
-
+            
+            await this.waitForUploads();
+            
             try {
-                //const url = 'http://localhost/php_g4/get_question.php'
                 const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                //const url = 'http://localhost/php_g4/get_question.php';
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -196,8 +199,8 @@ export default {
         async deleteQuestion(questionNo) {
             if (confirm('確定要刪除這個問題嗎？此操作不可撤銷。')) {
                 try {
-                    //const url = 'http://localhost/php_g4/get_question.php'
                     const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                    //const url = 'http://localhost/php_g4/get_question.php';
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {
@@ -235,17 +238,32 @@ export default {
             this.currentQuestion = this.getEmptyQuestion()
             this.uploadQueue = []
             this.isUploading = false
+            this.pendingUploads = 0
         },
         closeModalIfBackgroundClicked(event) {
             if (event.target.className === 'modal') {
                 this.closeModal()
             }
         },
+        async waitForUploads() {
+            return new Promise((resolve) => {
+                const checkUploads = () => {
+                    if (this.pendingUploads === 0) {
+                        resolve();
+                    } else {
+                        setTimeout(checkUploads, 100);
+                    }
+                };
+                checkUploads();
+            });
+        },
         handleImageUpload(event, type) {
             const file = event.target.files[0]
             if (file) {
                 this.uploadQueue.push({ file, type })
-                this.processUploadQueue()
+                if (!this.isUploading) {
+                    this.processUploadQueue()
+                }
             }
         },
         async processUploadQueue() {
@@ -260,8 +278,8 @@ export default {
             formData.append(type === 'answer' ? 'q_explainimg_img' : 'q_img', file)
 
             try {
-                //const url = 'http://localhost/php_G4/questionsImg.php';
-                const url = `${import.meta.env.VITE_API_URL}/questionsImg.php`;
+                const url = `${import.meta.env.VITE_API_URL}/questionsimg.php`;
+                //const url = 'http://localhost/php_g4/questionsimg.php';
                 const response = await fetch(url, {
                     method: 'POST',
                     body: formData
@@ -296,6 +314,7 @@ export default {
                 alert(`圖片 ${file.name} 上傳失敗，請稍後再試。錯誤詳情：${error.message}`)
             } finally {
                 this.isUploading = false
+                this.pendingUploads--;
                 if (this.uploadQueue.length > 0) {
                     this.processUploadQueue()
                 }
