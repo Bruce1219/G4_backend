@@ -133,8 +133,8 @@ export default {
             if (this.currentUser && this.currentUser.am_level === '1') {
                 const newStatus = user.am_status == 1 ? 0 : 1
 
-                // 发出请求更新数据库中的 am_status
-                const url = `http://localhost/php_g4/updateAdmin.php`
+                // const url = `http://localhost/php_g4/updateAdmin.php`//本地
+                const url = `${import.meta.env.VITE_API_URL}/updateAdmin.php` //部屬
                 const body = {
                     am_no: user.am_no,
                     am_status: newStatus
@@ -177,10 +177,12 @@ export default {
             console.log(this.currentUser)
         },
         fetchData() {
+            // const url = `http://localhost/php_g4/adminList.php`//本地
+            const url = `${import.meta.env.VITE_API_URL}/adminList.php` //部屬
             let body = {
                 page: 2
             }
-            fetch(`http://localhost/php_g4/adminList.php`, {
+            fetch(url, {
                 method: 'POST',
                 body: JSON.stringify(body)
             })
