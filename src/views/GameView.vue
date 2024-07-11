@@ -90,7 +90,8 @@ export default {
     methods: {
         async fetchQuestions() {
             try {
-                const url = 'http://localhost/php_g4/get_question.php'
+                //const url = 'http://localhost/php_g4/get_question.php'
+                const url = `http:// ${import.meta.env.VITE_API_URL}/get_question.php`
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -161,7 +162,8 @@ export default {
             }
 
             try {
-                const url = 'http://localhost/php_g4/get_question.php'
+                //const url = 'http://localhost/php_g4/get_question.php'
+                const url = `http:// ${import.meta.env.VITE_API_URL}/get_question.php`
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -194,7 +196,8 @@ export default {
         async deleteQuestion(questionNo) {
             if (confirm('確定要刪除這個問題嗎？此操作不可撤銷。')) {
                 try {
-                    const url = 'http://localhost/php_g4/get_question.php'
+                    //const url = 'http://localhost/php_g4/get_question.php'
+                    const url = `http:// ${import.meta.env.VITE_API_URL}/get_question.php`
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {
@@ -257,7 +260,8 @@ export default {
             formData.append(type === 'answer' ? 'q_explainimg_img' : 'q_img', file)
 
             try {
-                const url = 'http://localhost/php_G4/questionsImg.php';
+                //const url = 'http://localhost/php_G4/questionsImg.php';
+                const url = `http:// ${import.meta.env.VITE_API_URL}/questionsImg.php`;
                 const response = await fetch(url, {
                     method: 'POST',
                     body: formData
