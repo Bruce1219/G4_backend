@@ -50,7 +50,8 @@ export default {
     methods: {
         async fetchMembers() {
             try {
-                const response = await fetch('http://localhost/php_g4/memberd.php')
+                //const response = await fetch('http://localhost/php_g4/memberd.php')
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/memberd.php`)
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
@@ -68,7 +69,9 @@ export default {
         async toggleStatus(member) {
             try {
                 const newStatus = member.m_status === '1' ? '0' : '1'
-                const response = await fetch('http://localhost/php_g4/memberd.php', {
+                //const response = await fetch('http://localhost/php_g4/memberd.php', 
+                const response = await  fetch(`${import.meta.env.VITE_API_URL}/memberd.php`, 
+                {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
