@@ -213,7 +213,7 @@ export default {
             const newStatus = this.ao_status === 0
 
             // const url = `http://localhost/php_g4/updateUserActivity.php` //本地
-            const url = `http://localhost/php_g4/updateUserActivity.php` //部屬
+            const url = `${import.meta.env.VITE_API_URL}/updateUserActivity.php` //部屬
             const body = {
                 ao_no: this.display.ao_no,
                 ao_status: newStatus,
