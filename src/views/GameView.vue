@@ -1,11 +1,11 @@
 <template>
-    <section class="section">
-        <div class="container">
+    <section>
+        <div>
             <div>
                 <h1>食農問答管理</h1>
                 <button @click="showAddModal">+ 新增題目</button>
             </div>
-            <div class="table-container">
+            <div>
                 <table>
                     <thead>
                         <tr>
@@ -21,8 +21,8 @@
                             <td>{{ question.question }}</td>
                             <td>{{ question.correctAnswer }}</td>
                             <td>
-                                <button @click="editQuestion(question)" class="edit">編輯</button>
-                                <button @click="deleteQuestion(question.no)" class="delete">刪除</button>
+                                <button @click="editQuestion(question)">編輯</button>
+                                <button @click="deleteQuestion(question.no)">刪除</button>
                             </td>
                         </tr>
                     </tbody>
@@ -30,9 +30,9 @@
             </div>
         </div>
 
-        <div class="modal" v-if="showAddQuestionModal || showEditQuestionModal" @click="closeModalIfBackgroundClicked">
-            <div class="modal-content" @click.stop>
-                <span class="close" @click="closeModal">&times;</span>
+        <div v-if="showAddQuestionModal || showEditQuestionModal" @click="closeModalIfBackgroundClicked">
+            <div @click.stop>
+                <span @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
                 <form @submit.prevent="saveQuestion">
                     <label for="questionNo">問題題號</label>
@@ -78,53 +78,52 @@ export default {
     data() {
         return {
             questions: [],
-            showAddQuestionModal: false,
+            showAddQuestionModal: false, 
             showEditQuestionModal: false,
             modalTitle: '',
             modalAction: '',
             currentQuestion: null,
             uploadQueue: [],
-            isUploading: false
+            isUploading: false      
         }
     },
     methods: {
         async fetchQuestions() {
             try {
-                //const url = 'http://localhost/php_g4/get_question.php'
-                const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                const url = `${import.meta.env.VITE_API_URL}/get_question.php`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({ action: 'getQuestions' })
-                })
+                });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json()
-                console.log('API Response:', data)
+                const data = await response.json();
+                console.log('API Response:', data);
 
                 if (data.code === 200 && Array.isArray(data.data.list)) {
                     this.questions = data.data.list.map((question) => ({
                         ...question,
-                        options: Array.isArray(question.options)
+                        options: Array.isArray(question.options) 
                             ? question.options.map((option) => ({
-                                  key: option.key || option.q_options,
-                                  text: option.text || option.q_answer,
-                                  img: option.img || option.q_img
-                              }))
+                                key: option.key || option.q_options,
+                                text: option.text || option.q_answer,
+                                img: option.img || option.q_img
+                            }))
                             : []
-                    }))
-                    console.log('Processed questions:', this.questions)
+                    }));
+                    console.log('Processed questions:', this.questions);  
                 } else {
-                    throw new Error(data.msg || 'Unexpected data format received from the server')
+                    throw new Error(data.msg || 'Unexpected data format received from the server');
                 }
             } catch (error) {
-                console.error('獲取問題列表時發生錯誤:', error)
-                alert('獲取問題列表失敗，請稍後再試。錯誤詳情：' + error.message)
+                console.error('獲取問題列表時發生錯誤:', error);
+                alert('獲取問題列表失敗，請稍後再試。錯誤詳情：' + error.message);
             }
         },
         getEmptyQuestion() {
@@ -144,26 +143,20 @@ export default {
             }
         },
         editQuestion(question) {
-            this.currentQuestion = JSON.parse(JSON.stringify(question))
-            this.modalTitle = '編輯題目'
-            this.modalAction = '更新'
-            this.showEditQuestionModal = true
-        },
+            this.currentQuestion = JSON.parse(JSON.stringify(question));
+            this.modalTitle = '編輯題目';
+            this.modalAction = '更新';
+            this.showEditQuestionModal = true;
+        },  
         showAddModal() {
-            this.currentQuestion = this.getEmptyQuestion()
-            this.modalTitle = '新增題目'
-            this.modalAction = '新增'
-            this.showAddQuestionModal = true
+            this.currentQuestion = this.getEmptyQuestion();
+            this.modalTitle = '新增題目';
+            this.modalAction = '新增';
+            this.showAddQuestionModal = true;
         },
         async saveQuestion() {
-            if (this.isUploading || this.uploadQueue.length > 0) {
-                alert('請等待所有圖片上傳完成後再保存。')
-                return
-            }
-
             try {
-                //const url = 'http://localhost/php_g4/get_question.php'
-                const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                const url = `${import.meta.env.VITE_API_URL}/get_question.php`;
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: {
@@ -173,31 +166,29 @@ export default {
                         action: 'saveQuestion',
                         question: this.currentQuestion
                     })
-                })
+                });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json()
-
+                const data = await response.json();
                 if (data.code === 200) {
-                    await this.fetchQuestions()
-                    this.closeModal()
-                    alert(data.msg || '保存成功')
+                    await this.fetchQuestions();
+                    this.closeModal();
+                    alert(data.msg || '保存成功');
                 } else {
-                    throw new Error(data.msg || '保存失敗')
+                    throw new Error(data.msg || '保存失敗');
                 }
             } catch (error) {
-                console.error('保存問題時發生錯誤:', error)
-                alert('保存失敗，請稍後再試。錯誤詳情：' + error.message)
+                console.error('保存問題時發生錯誤:', error); 
+                alert('保存失敗，請稍後再試。錯誤詳情：' + error.message);
             }
         },
         async deleteQuestion(questionNo) {
             if (confirm('確定要刪除這個問題嗎？此操作不可撤銷。')) {
                 try {
-                    //const url = 'http://localhost/php_g4/get_question.php'
-                    const url = `${import.meta.env.VITE_API_URL}/get_question.php`
+                    const url = `${import.meta.env.VITE_API_URL}/get_question.php`;
                     const response = await fetch(url, {
                         method: 'POST',
                         headers: {
@@ -207,103 +198,101 @@ export default {
                             action: 'deleteQuestion',
                             questionNo: questionNo
                         })
-                    })
-
+                    });
+                    
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`)
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-
-                    const data = await response.json()
+                    
+                    const data = await response.json();
 
                     if (data.code === 200) {
-                        await this.fetchQuestions()
-                        alert(data.msg || '刪除成功')
+                        await this.fetchQuestions();
+                        alert(data.msg || '刪除成功');  
                     } else {
-                        throw new Error(data.msg || '刪除失敗')
+                        throw new Error(data.msg || '刪除失敗');
                     }
                 } catch (error) {
-                    console.error('刪除問題時發生錯誤:', error)
-                    alert('刪除失敗，請稍後再試。錯誤詳情：' + error.message)
+                    console.error('刪除問題時發生錯誤:', error);
+                    alert('刪除失敗，請稍後再試。錯誤詳情：' + error.message);
                 }
             }
         },
         closeModal() {
-            this.showAddQuestionModal = false
-            this.showEditQuestionModal = false
-            this.modalTitle = ''
-            this.modalAction = ''
-            this.currentQuestion = this.getEmptyQuestion()
-            this.uploadQueue = []
-            this.isUploading = false
+            this.showAddQuestionModal = false;
+            this.showEditQuestionModal = false;
+            this.modalTitle = '';  
+            this.modalAction = '';
+            this.currentQuestion = this.getEmptyQuestion();
+            this.uploadQueue = []; 
+            this.isUploading = false;
         },
         closeModalIfBackgroundClicked(event) {
-            if (event.target.className === 'modal') {
-                this.closeModal()
+            if (event.target === event.currentTarget) {
+                this.closeModal(); 
             }
         },
         handleImageUpload(event, type) {
-            const file = event.target.files[0]
+            const file = event.target.files[0];
             if (file) {
-                this.uploadQueue.push({ file, type })
-                this.processUploadQueue()
-            }
+                this.uploadQueue.push({ file, type });
+                this.processUploadQueue();
+            }  
         },
         async processUploadQueue() {
             if (this.isUploading || this.uploadQueue.length === 0) {
-                return
+                return;
             }
 
-            this.isUploading = true
-            const { file, type } = this.uploadQueue.shift()
-
-            let formData = new FormData()
-            formData.append(type === 'answer' ? 'q_explainimg_img' : 'q_img', file)
+            this.isUploading = true;
+            const { file, type } = this.uploadQueue.shift();
+            
+            let formData = new FormData();
+            formData.append(type === 'answer' ? 'q_explainimg_img' : 'q_img', file);
 
             try {
-                //const url = 'http://localhost/php_G4/questionsImg.php';
                 const url = `${import.meta.env.VITE_API_URL}/questionsImg.php`;
                 const response = await fetch(url, {
                     method: 'POST',
-                    body: formData
-                })
+                    body: formData  
+                });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`)
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const result = await response.json()
-                console.log('Server response:', result)
-
+                const result = await response.json();
+                console.log('Server response:', result);
+                
                 if (result.code === 200) {
-                    const uploadedFileName =
-                        type === 'answer'
-                            ? result.data.q_explainimg_img.fileName
-                            : result.data.q_img.fileName
+                    const uploadedFileName = type === 'answer'
+                        ? result.data.q_explainimg_img.fileName
+                        : result.data.q_img.fileName;
                     if (type === 'answer') {
-                        this.currentQuestion.answer_image = uploadedFileName
+                        this.currentQuestion.answer_image = uploadedFileName;
                     } else {
-                        const option = this.currentQuestion.options.find((opt) => opt.key === type)
+                        const option = this.currentQuestion.options.find((opt) => opt.key === type);
                         if (option) {
-                            option.img = uploadedFileName
+                            option.img = uploadedFileName;
                         }
                     }
-                    console.log(`圖片上傳成功: ${uploadedFileName}`)
+                    console.log(`圖片上傳成功: ${uploadedFileName}`);
                 } else {
-                    throw new Error(result.msg || '圖片上傳失敗')
+                    throw new Error(result.msg || '圖片上傳失敗');  
                 }
             } catch (error) {
-                console.error('圖片上傳錯誤:', error)
-                alert(`圖片 ${file.name} 上傳失敗，請稍後再試。錯誤詳情：${error.message}`)
+                console.error('圖片上傳錯誤:', error);
+                alert(`圖片 ${file.name} 上傳失敗，請稍後再試。錯誤詳情：${error.message}`);
             } finally {
-                this.isUploading = false
+                this.isUploading = false;
                 if (this.uploadQueue.length > 0) {
-                    this.processUploadQueue()
+                    this.processUploadQueue();
                 }
             }
         }
     },
     mounted() {
-        this.fetchQuestions()
+        this.fetchQuestions();  
     }
 }
 </script>

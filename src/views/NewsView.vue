@@ -103,8 +103,8 @@
             <div class="delete-alert lightBox" @click.stop>
                 <h2>確定要刪除!!</h2>
                 <div class="button">
-                    <button type="button" class="cancel" @click="deleteNews()">取消</button>
-                    <button class="delete confirm" @click="deleteConfirm()">刪除</button>
+                    <button type="button" class="delete" @click="deleteNews()">取消</button>
+                    <button class="cancel" @click="deleteConfirm()">刪除</button>
                 </div>
             </div>
         </div>
@@ -136,7 +136,7 @@ export default {
             this.$refs.fileInput.value = '';
         },
         parsePic(file) {
-            return `${import.meta.env.VITE_FILE_URL}${file}`;
+            return `${import.meta.env.VITE_FILE_URL}news-img/${file}`;
         },
         fetchData() {
              const url = `${import.meta.env.VITE_API_URL}/newsList.php`;
@@ -293,7 +293,7 @@ export default {
         },
         deleteConfirm() {
             const url = `${import.meta.env.VITE_API_URL}/deleteNews.php`;
-            this.deleteImage()
+            this.deleteImage();
             // let url = `http://localhost/php_G4/deleteNews.php`
             let body = {
                 n_no: this.n_no
