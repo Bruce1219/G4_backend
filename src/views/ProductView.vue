@@ -30,7 +30,9 @@
                             <td>{{ product.p_popular == '0' ? '熱門商品' : '一般商品' }}</td>
                             <td>
                                 <button @click="editProduct(product)" class="edit">編輯</button>
-                                <button @click="deleteProduct(product.p_no)"class="delete">刪除</button>
+                                <button @click="deleteProduct(product.p_no)" class="delete">
+                                    刪除
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -38,20 +40,34 @@
             </div>
         </div>
 
-        <div class="modal" v-if="showAddProductModal || showEditProductModal" @click="closeModalIfBackgroundClicked">
+        <div
+            class="modal"
+            v-if="showAddProductModal || showEditProductModal"
+            @click="closeModalIfBackgroundClicked"
+        >
             <div class="modal-content" @click.stop>
                 <span class="close" @click="closeModal">&times;</span>
                 <h2>{{ modalTitle }}</h2>
                 <form @submit.prevent="saveProduct">
                     <label v-if="showEditProductModal" for="productNo">商品編號</label>
-                    <input v-if="showEditProductModal" type="text" id="productNo" v-model="currentProduct.p_no" readonly />
+                    <input
+                        v-if="showEditProductModal"
+                        type="text"
+                        id="productNo"
+                        v-model="currentProduct.p_no"
+                        readonly
+                    />
 
                     <label for="productName">商品名稱</label>
                     <input type="text" id="productName" v-model="currentProduct.p_name" required />
 
                     <label for="productCategory">商品類別</label>
                     <select id="productCategory" v-model="currentProduct.pc_no" required>
-                        <option v-for="category in uniqueCategories" :key="category.pc_no" :value="category.pc_no">
+                        <option
+                            v-for="category in uniqueCategories"
+                            :key="category.pc_no"
+                            :value="category.pc_no"
+                        >
                             {{ category.pc_name }}
                         </option>
                     </select>
@@ -64,7 +80,13 @@
                     </select>
 
                     <label for="productFee">商品價格</label>
-                    <input type="number" id="productFee" v-model="currentProduct.p_fee" required min="0" />
+                    <input
+                        type="number"
+                        id="productFee"
+                        v-model="currentProduct.p_fee"
+                        required
+                        min="0"
+                    />
 
                     <label for="productUnit">購買單位</label>
                     <input type="text" id="productUnit" v-model="currentProduct.p_unit" required />
@@ -76,7 +98,11 @@
                     </select>
 
                     <label for="productDescription">商品描述</label>
-                    <textarea id="productDescription" v-model="currentProduct.p_info" required></textarea>
+                    <textarea
+                        id="productDescription"
+                        v-model="currentProduct.p_info"
+                        required
+                    ></textarea>
 
                     <div v-for="(image, index) in currentProduct.pi_img" :key="index">
                         <label :for="'productImage' + (index + 1)">商品圖片 {{ index + 1 }}</label>
@@ -111,12 +137,12 @@ export default {
     computed: {
         sortedProducts() {
             return [...this.products].sort((a, b) => {
-                const aStr = typeof a.p_no === 'string' ? a.p_no : '';
-                const bStr = typeof b.p_no === 'string' ? b.p_no : '';
-                const aNumber = parseInt(aStr.replace(/\D/g, '') || '0', 10);
-                const bNumber = parseInt(bStr.replace(/\D/g, '') || '0', 10);
-                return aNumber - bNumber;
-            });
+                const aStr = typeof a.p_no === 'string' ? a.p_no : ''
+                const bStr = typeof b.p_no === 'string' ? b.p_no : ''
+                const aNumber = parseInt(aStr.replace(/\D/g, '') || '0', 10)
+                const bNumber = parseInt(bStr.replace(/\D/g, '') || '0', 10)
+                return aNumber - bNumber
+            })
         },
         uniqueCategories() {
             const categories = this.products.map((product) => ({
@@ -137,7 +163,7 @@ export default {
                     throw new Error(`HTTP error! status: ${response.status}`)
                 }
                 const data = await response.json()
-                this.products = data.data.list.map(product => ({
+                this.products = data.data.list.map((product) => ({
                     ...product,
                     p_no: product.p_no ? String(product.p_no) : ''
                 }))
@@ -156,7 +182,7 @@ export default {
                 return data.data.list
             } catch (error) {
                 console.error('獲取農場列表時發生錯誤:', error)
-                alert('獲取農場列表失敗，請稍後再試。')
+                alert('獲取農場列表失敗,請稍後再試。')
                 return []
             }
         },
@@ -199,7 +225,11 @@ export default {
 
                 for (const key in this.currentProduct) {
                     if (key !== 'pi_img') {
-                        formData.append(key, this.currentProduct[key])
+                        if (key === 'p_fee') {
+                            formData.append(key, Number(this.currentProduct[key]))
+                        } else {
+                            formData.append(key, this.currentProduct[key])
+                        }
                     }
                 }
 
@@ -207,13 +237,16 @@ export default {
                     formData.append(`pi_img[${index}]`, img)
                 })
 
-                const method = this.showAddProductModal ? 'POST' : 'PUT'
-                const url = this.showAddProductModal
-                    ? 'http://localhost/php_g4/product_api.php'
-                    : `http://localhost/php_g4/product_api.php?id=${this.currentProduct.p_no}`
+                const isUpdate = !this.showAddProductModal
+                formData.append('isUpdate', isUpdate ? '1' : '0')
+
+                const url = 'http://localhost/php_g4/product_api.php'
+                if (isUpdate) {
+                    formData.append('p_no', this.currentProduct.p_no)
+                }
 
                 const response = await fetch(url, {
-                    method,
+                    method: 'POST',
                     body: formData
                 })
 
@@ -232,7 +265,7 @@ export default {
                 }
             } catch (error) {
                 console.error('保存商品時發生錯誤:', error)
-                alert('保存商品失敗，請稍後再試。錯誤詳情：' + error.message)
+                alert('保存商品失敗,請稍後再試。錯誤詳情:' + error.message)
             }
         },
         async deleteProduct(productId) {
@@ -286,7 +319,7 @@ export default {
                     }
                 } catch (error) {
                     console.error('上傳圖片時發生錯誤:', error)
-                    alert('上傳圖片失敗，請稍後再試。錯誤詳情：' + error.message)
+                    alert('上傳圖片失敗,請稍後再試。錯誤詳情:' + error.message)
                 }
             }
         },
@@ -312,7 +345,7 @@ export default {
                 }
             }
             return uploadedImages
-        },
+        }
     },
     async mounted() {
         await this.fetchProducts()
@@ -422,7 +455,8 @@ $red: #ff4444;
                                 text-align: center;
                             }
 
-                            .edit, .delete {
+                            .edit,
+                            .delete {
                                 color: #fff;
                                 border: none;
                                 padding: 5px 10px;
