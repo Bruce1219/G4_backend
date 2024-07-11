@@ -122,7 +122,7 @@ export default {
         async fetchFarms() {
             try {
                 //const response = await fetch('http://localhost/php_g4/farm.php')
-                const response = await fetch(`http://${import.meta.env.VITE_API_URL}/farm.php`)
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/farm.php`)
                 if (!response.ok) {
                     throw new Error(`HTTP錯誤！狀態：${response.status}`)
                 }
@@ -191,8 +191,8 @@ export default {
                 const url = this.showAddFarmModal
                     //? 'http://localhost/php_g4/farm.php'
                     //: `http://localhost/php_g4/farm.php?id=${this.currentFarm.f_no}`
-                    ? `http://${import.meta.env.VITE_API_URL}/farm.php`
-                    : `http://${import.meta.env.VITE_API_URL}/farm.php?id=${this.currentFarm.f_no}`
+                    ? `${import.meta.env.VITE_API_URL}/farm.php`
+                    : `${import.meta.env.VITE_API_URL}/farm.php?id=${this.currentFarm.f_no}`
 
                 const response = await fetch(url, {
                     method,
@@ -232,7 +232,7 @@ export default {
 
             try {
                 //const response = await fetch(`http://localhost/php_g4/farm.php?id=${farmNo}`, {
-                const response = await fetch(`http://${import.meta.env.VITE_API_URL}/farm.php?id=${farmNo}`, {
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/farm.php?id=${farmNo}`, {
                     method: 'DELETE'
                 })
                 if (!response.ok) {
@@ -283,7 +283,7 @@ export default {
 
             try {
                // const url = 'http://localhost/php_G4/farmImg.php'
-                const url = `http://${import.meta.env.VITE_API_URL}/farmImg.php`
+                const url = `${import.meta.env.VITE_API_URL}/farmImg.php`
                 const response = await fetch(url, {
                     method: 'POST',
                     body: formData

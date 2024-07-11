@@ -158,7 +158,7 @@ export default {
     methods: {
         async fetchProducts() {
             try {
-                const response = await fetch(`http://${import.meta.env.VITE_API_URL}/product_api.php`)
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/product_api.php`)
                 //const response = await fetch('http://localhost/php_g4/product_api.php')
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
@@ -175,7 +175,7 @@ export default {
         },
         async fetchFarms() {
             try {
-                const response = await fetch(`http://${import.meta.env.VITE_API_URL}/farm.php`)
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/farm.php`)
                 // const response = await fetch('http://localhost/php_g4/farm.php')
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
@@ -242,7 +242,7 @@ export default {
                 const isUpdate = !this.showAddProductModal
                 formData.append('isUpdate', isUpdate ? '1' : '0')
 
-                const url = `http://${import.meta.env.VITE_API_URL}/product_api.php`
+                const url = `${import.meta.env.VITE_API_URL}/product_api.php`
                 // const url = 'http://localhost/php_g4/product_api.php'
                 if (isUpdate) {
                     formData.append('p_no', this.currentProduct.p_no)
@@ -276,7 +276,7 @@ export default {
                 try {
                     const response = await fetch(
                         // `http://localhost/php_g4/product_api.php?id=${productId}`,
-                        `http://${import.meta.env.VITE_API_URL}/product_api.php?id=${productId}`,
+                        `${import.meta.env.VITE_API_URL}/product_api.php?id=${productId}`,
                         { method: 'DELETE' }
                     )
                     if (!response.ok) {
@@ -306,7 +306,7 @@ export default {
                     const formData = new FormData()
                     formData.append('pi_img', file)
                     // url='http://localhost/php_g4/productimg.php';
-                    url = ' ${import.meta.env.VITE_API_URL}/productimg.php'
+                    url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
                     const response = await fetch(url, {
                         method: 'POST',
                         body: formData
@@ -336,7 +336,7 @@ export default {
                     const formData = new FormData()
                     formData.append('pi_img', img)
                     // url='http://localhost/php_g4/productimg.php';
-                    url = ' ${import.meta.env.VITE_API_URL}/productimg.php'
+                    url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
                     const response = await fetch(url, {
                         method: 'POST',
                         body: formData
