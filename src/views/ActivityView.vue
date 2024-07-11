@@ -71,7 +71,9 @@
                 <div >
                     <label  >
                     <span>新增圖片 : </span> 
-                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" @change="getfile($event)"/>
+                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" 
+                    ref="fileInput"
+                    @change="getfile($event)"/>
                     <span class="fakeBrowBTN">選擇檔案</span> <span>{{ file ? file.name : '沒有選擇任何檔案' }}</span>
                 </label>
                 </div>
@@ -85,11 +87,13 @@
                 </div>
                 <div>
                     <span>報名上限 : </span>
-                    <input type="number" name="a_max" v-model="a_max" />
+                    <input type="text" name="a_max" v-model="a_max"  max="999" min="0" maxlength="3"
+                    @keyup='handleKeyUp($event)'>
                 </div>
                 <div>
                     <span>活動費用 : </span>
-                    <input type="number" name="a_fee" v-model="a_fee" />
+                    <input type="number" name="a_fee" v-model="a_fee"
+                    @keyup='handleKeyUp($event)' />
                 </div>
                 <div>
                     <span>活動日期: </span>
@@ -201,12 +205,29 @@ export default {
         }
     },
     methods: {
+        handleKeyUp(event) {
+            const target = event.target
+            let value = target.value.replace(/\D/g, '')
+            target.value = value
+            const maxLength = target.getAttribute('maxlength')
+
+            if (value.length >= maxLength) {
+                const next = target.nextElementSibling?.nextElementSibling
+                if (next && next.tagName === 'INPUT') {
+                    next.focus()
+                }
+            }
+        },
+        clearFile() {
+            this.$refs.fileInput.value = '';
+        },
         parsePic(file) {
             return new URL(`../assets/image/${file}`, import.meta.url).href
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
             //新增情況
+            this.clearFile();
             this.scrollToTop();
             if (this.addSwitch === false) {
                 this.addSwitch = true;
