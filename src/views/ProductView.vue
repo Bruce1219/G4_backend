@@ -158,7 +158,7 @@ export default {
     methods: {
         async fetchProducts() {
             try {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}product_api.php.php`)
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/product_api.php.php`)
                 //const response = await fetch('http://localhost/php_g4/product_api.php')
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`)
