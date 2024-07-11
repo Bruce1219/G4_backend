@@ -276,7 +276,7 @@ export default {
                 try {
                     const response = await fetch(
                         // `http://localhost/php_g4/product_api.php?id=${productId}`,
-                        `${import.meta.env.VITE_API_URL}/product_api.php?id=${productId}`,
+                        `${import.meta.env.VITE_API_URL}/product_api.php.php?id=${productId}`,
                         { method: 'DELETE' }
                     )
                     if (!response.ok) {
@@ -306,7 +306,7 @@ export default {
                     const formData = new FormData()
                     formData.append('pi_img', file)
                     // url='http://localhost/php_g4/productimg.php';
-                    url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
+                    const url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
                     const response = await fetch(url, {
                         method: 'POST',
                         body: formData
@@ -336,7 +336,7 @@ export default {
                     const formData = new FormData()
                     formData.append('pi_img', img)
                     // url='http://localhost/php_g4/productimg.php';
-                    url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
+                    const url = ` ${import.meta.env.VITE_API_URL}/productimg.php`
                     const response = await fetch(url, {
                         method: 'POST',
                         body: formData
