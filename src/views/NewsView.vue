@@ -5,38 +5,40 @@
                 <h1>最新消息管理</h1>
                 <button @click="addToggleButton()">+ 新增消息</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">日期</th>
-                        <th scope="col">消息圖片</th>
-                        <th scope="col">標題</th>
-                        <th scope="col">內文</th>
-                        <th scope="col">連結</th>
-                        <th scope="col">狀態</th>
-                        <th scope="col">操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(item, index) in responseData" :key="item.n_no">
-                        <td>{{ item.n_time }}</td>
-                        <td>
-                            <div class="pic">
-                                <img :src="parsePic(item.n_img)" alt="最新消息圖片" />
-                            </div>
-                        </td>
-                        <td>{{ item.n_topic }}</td>
-                        <td>{{ item.n_article }}</td>
-                        <td><a :href="item.n_link" target="_blank">連結</a></td>
-                        <td v-show="item.n_status == 1">上架</td>
-                        <td v-show="item.n_status == 0">下架</td>
-                        <td>
-                            <button class="edit" @click="editNews(index)">編輯</button>
-                            <button class="delete edit" @click="deleteNews(index)">刪除</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="wrap-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">日期</th>
+                            <th scope="col">消息圖片</th>
+                            <th scope="col">標題</th>
+                            <th scope="col">內文</th>
+                            <th scope="col">連結</th>
+                            <th scope="col">狀態</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(item, index) in responseData" :key="item.n_no">
+                            <td>{{ item.n_time }}</td>
+                            <td>
+                                <div class="pic">
+                                    <img :src="parsePic(item.n_img)" alt="最新消息圖片" />
+                                </div>
+                            </td>
+                            <td>{{ item.n_topic }}</td>
+                            <td>{{ item.n_article }}</td>
+                            <td><a :href="item.n_link" target="_blank">連結</a></td>
+                            <td v-show="item.n_status == 1">上架</td>
+                            <td v-show="item.n_status == 0">下架</td>
+                            <td>
+                                <button class="edit" @click="editNews(index)">編輯</button>
+                                <button class="delete edit" @click="deleteNews(index)">刪除</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="lightBoxWrapper" v-show="addSwitch || editSwitch">
             <div class="lightBox" ref="addLightBox">
@@ -60,8 +62,8 @@
                                 @change="getFile($event)"
                                 ref="fileInput"
                             />
-                            <span class="fakeBrowBTN" >選擇檔案</span>
-                            <span>{{ n_img ? n_img  : '沒有選擇任何檔案' }}</span>
+                            <span class="fakeBrowBTN">選擇檔案</span>
+                            <span>{{ n_img ? n_img : '沒有選擇任何檔案' }}</span>
                         </label>
                     </div>
                     <div>
@@ -108,7 +110,6 @@
                 </div>
             </div>
         </div>
-       
     </section>
 </template>
 
@@ -133,13 +134,13 @@ export default {
     },
     methods: {
         clearFile() {
-            this.$refs.fileInput.value = '';
+            this.$refs.fileInput.value = ''
         },
         parsePic(file) {
-            return `${import.meta.env.VITE_FILE_URL}news-img/${file}`;
+            return `${import.meta.env.VITE_FILE_URL}news-img/${file}`
         },
         fetchData() {
-             const url = `${import.meta.env.VITE_API_URL}/newsList.php`;
+            const url = `${import.meta.env.VITE_API_URL}/newsList.php`
             fetch(url, {
                 method: 'POST'
             })
@@ -156,20 +157,20 @@ export default {
                 this.addSwitch = true
                 this.n_no = this.responseData.length + 1
             } else {
-                this.addSwitch = false;
-                this.n_no = '';
-                this.n_topic = '';
-                this.n_img = null;
-                this.n_article = '';
-                this.n_link = '';
-                this.n_time = '';
-                this.n_status = '';
+                this.addSwitch = false
+                this.n_no = ''
+                this.n_topic = ''
+                this.n_img = null
+                this.n_article = ''
+                this.n_link = ''
+                this.n_time = ''
+                this.n_status = ''
                 this.file = null
             }
             console.log(this.n_img)
         },
         addNewsConfirm() {
-            const url = `${import.meta.env.VITE_API_URL}/addNews.php`;
+            const url = `${import.meta.env.VITE_API_URL}/addNews.php`
             this.updateImage()
             // const url = `http://localhost/php_G4/addNews.php`
             let body = {
@@ -220,19 +221,18 @@ export default {
                 this.n_status = this.responseData[index].n_status
                 this.n_time = this.responseData[index].n_time
                 this.n_topic = this.responseData[index].n_topic
-                this.oldFileName =
-                    `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
+                this.oldFileName = `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
             } else {
                 this.editSwitch = false
-                this.n_no = '';
-                this.n_topic = '';
-                this.n_img = null;
-                this.n_article = '';
-                this.n_link = '';
-                this.n_time = '';
-                this.n_status = '';
+                this.n_no = ''
+                this.n_topic = ''
+                this.n_img = null
+                this.n_article = ''
+                this.n_link = ''
+                this.n_time = ''
+                this.n_status = ''
                 this.file = null
-                this.oldFileName = '';
+                this.oldFileName = ''
             }
         },
         editConfirm() {
@@ -242,7 +242,7 @@ export default {
             }
             console.log(this.n_status)
             // const url = `http://localhost/php_G4/editNews.php`
-            const url = `${import.meta.env.VITE_API_URL}/editNews.php`;
+            const url = `${import.meta.env.VITE_API_URL}/editNews.php`
             let body = {
                 n_no: this.n_no,
                 n_img: this.n_img,
@@ -283,8 +283,7 @@ export default {
             if (this.deleteSwitch === false) {
                 this.deleteSwitch = true
                 this.n_no = this.responseData[index].n_no
-                this.oldFileName =
-                  `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
+                this.oldFileName = `${import.meta.env.VITE_API_URL}/ ${this.responseData[index].n_img}`
             } else {
                 this.deleteSwitch = false
                 this.a_no = ''
@@ -292,8 +291,8 @@ export default {
             }
         },
         deleteConfirm() {
-            const url = `${import.meta.env.VITE_API_URL}/deleteNews.php`;
-            this.deleteImage();
+            const url = `${import.meta.env.VITE_API_URL}/deleteNews.php`
+            this.deleteImage()
             // let url = `http://localhost/php_G4/deleteNews.php`
             let body = {
                 n_no: this.n_no
@@ -318,13 +317,13 @@ export default {
                 })
         },
         getFile(event) {
-                this.file = event.target.files[0]
+            this.file = event.target.files[0]
             console.log(this.file)
             this.n_img = this.file.name
             console.log(this.n_img)
         },
         updateImage() {
-            const url = `${import.meta.env.VITE_API_URL}/addNewsImage.php`;
+            const url = `${import.meta.env.VITE_API_URL}/addNewsImage.php`
             let formData = new FormData()
             formData.append('n_img', this.file)
             fetch(url, {
@@ -337,7 +336,7 @@ export default {
                 })
         },
         deleteImage() {
-            const url = `${import.meta.env.VITE_API_URL}/deleteNewsImage.php`;
+            const url = `${import.meta.env.VITE_API_URL}/deleteNewsImage.php`
             let body = {
                 oldFileName: this.oldFileName
             }
@@ -372,6 +371,8 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
+        max-width: none;
+        height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
         div {
@@ -399,136 +400,143 @@ export default {
                 }
             }
         }
-        table {
+        .wrap-table {
+            //有scrollbar
             width: 100%;
+            height: 75%;
+            overflow: auto;
             margin-top: 30px;
-            background-color: #fff;
-            border-collapse: separate;
-            border-spacing: 0;
-            thead {
-                text-align: center;
-                font-weight: bold;
+            table {
+                width: 100%;
+                // margin-top: 30px;
+                background-color: #fff;
                 border-collapse: separate;
-                border-radius: 20px;
-                background-color: $darkGreen;
-                tr {
+                border-spacing: 0;
+                thead {
+                    text-align: center;
+                    font-weight: bold;
                     border-collapse: separate;
                     border-radius: 20px;
-                    vertical-align: middle; /* 垂直居中對齊 */
-                    th {
-                        color: #fff;
-                        font-family: Arial, sans-serif;
-                        font-size: 13px;
-                        padding: 10px;
-                        border: solid 1px $darkGreen;
+                    background-color: $darkGreen;
+                    tr {
+                        border-collapse: separate;
+                        border-radius: 20px;
+                        vertical-align: middle; /* 垂直居中對齊 */
+                        th {
+                            color: #fff;
+                            font-family: Arial, sans-serif;
+                            font-size: 13px;
+                            padding: 10px;
+                            border: solid 1px $darkGreen;
+                        }
                     }
                 }
-            }
-            tr {
-                &:nth-child(even) {
-                    background-color: #f8f8f8;
-                }
-                td {
-                    font-size: 12px;
-                    margin: 0 3px;
-                    text-align: center;
-                    border-bottom: solid 1px;
-                    border: solid 0.1px #ddd;
-                    vertical-align: middle; /* 垂直居中對齊 */
-                    overflow: auto;
-                    &::-webkit-scrollbar {
-                        width: 1px;
+                tr {
+                    &:nth-child(even) {
+                        background-color: #f8f8f8;
                     }
-                    a {
-                        color: $darkGreen;
-                        text-decoration: none;
-                        cursor: pointer;
+                    td {
+                        font-size: 12px;
+                        margin: 0 3px;
+                        text-align: center;
+                        border-bottom: solid 1px;
+                        border: solid 0.1px #ddd;
+                        vertical-align: middle; /* 垂直居中對齊 */
+                        overflow: auto;
+                        &::-webkit-scrollbar {
+                            width: 1px;
+                        }
+                        a {
+                            color: $darkGreen;
+                            text-decoration: none;
+                            cursor: pointer;
+                        }
                     }
                 }
-            }
-            /*第一欄第一列：左上*/
-            tr:first-child th:first-child {
-                // border-top-left-radius: 20px;
-                width: 10%;
-                padding: 10px;
-            }
-            tr:first-child th:nth-child(2) {
-                width: 10%;
-                padding: 10px;
-            }
-            tr:first-child th:nth-child(3) {
-                width: 20%;
-                padding: 10px;
-            }
-            tr:first-child th:nth-child(4) {
-                width: 34%;
-                padding: 10px;
-            }
-            tr:first-child th:nth-child(5) {
-                width: 7%;
-                padding: 10px;
-            }
-            tr:first-child th:nth-child(6) {
-                width: 7%;
-                padding: 10px;
-            }
-            tr:first-child th:last-child {
-                width: 15%;
-                padding: 10px;
-            }
-            /*第一欄最後列：左下*/
-            tr:last-child td:first-child {
-                border-bottom-left-radius: 20px;
-                width: 10%;
-            }
-            /*最後欄第一列：右上*/
-            tr:first-child th:last-child {
-                // border-top-right-radius: 20px;
-                width: 10%;
-            }
-            /*最後欄第一列：右下*/
-            tr:last-child td:last-child {
-                border-bottom-right-radius: 20px;
-            }
-            tr:first-child td:nth-child(5) {
-                width: 5%;
-                padding: 10px;
-            }
-            td:last-child {
-                width: 10%;
-                line-height: 1;
-            }
-            .pic {
-                display: flex;
-                align-items: center; /* 垂直居中對齊 */
-                justify-content: center; /* 水平居中對齊 */
-                padding: 5px;
+                /*第一欄第一列：左上*/
+                tr:first-child th:first-child {
+                    // border-top-left-radius: 20px;
+                    width: 10%;
+                    padding: 10px;
+                }
+                tr:first-child th:nth-child(2) {
+                    width: 10%;
+                    padding: 10px;
+                }
+                tr:first-child th:nth-child(3) {
+                    width: 20%;
+                    padding: 10px;
+                }
+                tr:first-child th:nth-child(4) {
+                    width: 34%;
+                    padding: 10px;
+                }
+                tr:first-child th:nth-child(5) {
+                    width: 7%;
+                    padding: 10px;
+                }
+                tr:first-child th:nth-child(6) {
+                    width: 7%;
+                    padding: 10px;
+                }
+                tr:first-child th:last-child {
+                    width: 15%;
+                    padding: 10px;
+                }
+                /*第一欄最後列：左下*/
+                tr:last-child td:first-child {
+                    border-bottom-left-radius: 20px;
+                    width: 10%;
+                }
+                /*最後欄第一列：右上*/
+                tr:first-child th:last-child {
+                    // border-top-right-radius: 20px;
+                    width: 10%;
+                }
+                /*最後欄第一列：右下*/
+                tr:last-child td:last-child {
+                    border-bottom-right-radius: 20px;
+                }
+                tr:first-child td:nth-child(5) {
+                    width: 5%;
+                    padding: 10px;
+                }
+                td:last-child {
+                    width: 10%;
+                    line-height: 1;
+                }
+                .pic {
+                    display: flex;
+                    align-items: center; /* 垂直居中對齊 */
+                    justify-content: center; /* 水平居中對齊 */
+                    padding: 5px;
 
-                img {
-                    width: 100px;
-                    height: 80px;
-                    object-fit: cover;
-                    // vertical-align: top;
-                    display: block;
-                    margin: 0 auto; /* 水平居中 */
+                    img {
+                        width: 100px;
+                        height: 80px;
+                        object-fit: cover;
+                        // vertical-align: top;
+                        display: block;
+                        margin: 0 auto; /* 水平居中 */
+                    }
                 }
-            }
-            .edit {
-                // width: 20px;
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: none;
-                padding: 7px 20px;
-                margin: 5px 0;
-                border-radius: 20px;
-                transition: 0.5s;
-                &:hover {
-                    background-color: $red;
+                .edit {
+                    // width: 20px;
+                    color: #fff;
+                    text-decoration: none;
+                    background-color: $darkGreen;
+                    border: none;
+                    padding: 7px 20px;
+                    margin: 5px 0;
+                    border-radius: 20px;
+                    transition: 0.5s;
+                    &:hover {
+                        background-color: $red;
+                    }
                 }
-            }
-            .delete {
-                background-color: red;
+                .delete {
+                    background-color: red;
+                }
             }
         }
     }
@@ -586,32 +594,32 @@ export default {
                         }
                     }
                 }
-                label{
+                label {
                     width: 100%;
                     margin: 10px 0;
-                input[type='file'] {
-                    border: none;
-                    height: 35px;
-                    margin: 0;
-                    padding: 0;
-                    background-color: transparent;
-                    color: #144433;
-                    position: absolute;
-                    opacity: 0;
-                    &:focus {
-                        outline: none;
+                    input[type='file'] {
+                        border: none;
+                        height: 35px;
+                        margin: 0;
+                        padding: 0;
+                        background-color: transparent;
+                        color: #144433;
+                        position: absolute;
+                        opacity: 0;
+                        &:focus {
+                            outline: none;
+                        }
+                    }
+                    .fakeBrowBTN {
+                        background-color: $lightGreen;
+                        color: #fff;
+                        border: none;
+                        padding: 5px;
+                        border-radius: 5px;
+                        margin-right: 5px;
+                        margin-left: 18%;
                     }
                 }
-                .fakeBrowBTN {
-                    background-color: $lightGreen;
-                    color: #fff;
-                    border: none;
-                    padding: 5px;
-                    border-radius: 5px;
-                    margin-right: 5px;
-                    margin-left: 18%;
-                }
-            }
                 textarea {
                     margin-left: 20px;
                     padding: 10px;

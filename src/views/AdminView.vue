@@ -243,10 +243,11 @@ export default {
     font-family: $pFont;
     cursor: default;
     display: flex;
-   margin-left: 20%;
+    margin-left: 20%;
     justify-content: flex-start;
     .container {
         width: 100%;
+        max-width: none;
         height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
