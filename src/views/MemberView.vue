@@ -28,7 +28,10 @@
                                 {{ member.m_status == '1' ? '正常' : '停權' }}
                             </td>
                             <td>
-                                <button @click="toggleStatus(member)" :class="member.m_status === '1' ? 'useless' : 'normal'">
+                                <button
+                                    @click="toggleStatus(member)"
+                                    :class="member.m_status === '1' ? 'useless' : 'normal'"
+                                >
                                     {{ member.m_status == '1' ? '停權' : '啟用' }}
                                 </button>
                             </td>
@@ -69,9 +72,8 @@ export default {
         async toggleStatus(member) {
             try {
                 const newStatus = member.m_status === '1' ? '0' : '1'
-                //const response = await fetch('http://localhost/php_g4/memberd.php', 
-                const response = await  fetch(`${import.meta.env.VITE_API_URL}/memberd.php`, 
-                {
+                //const response = await fetch('http://localhost/php_g4/memberd.php',
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/memberd.php`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -127,10 +129,11 @@ $red: #ff4444;
 
     .container {
         width: 80%;
+        max-width: none;
         padding: 30px;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 60px);
+        height: 85vh;
         margin-left: 20%;
 
         > div:first-child {
@@ -189,7 +192,8 @@ $red: #ff4444;
                                 text-align: center;
                             }
 
-                            &.normal, &.useless {
+                            &.normal,
+                            &.useless {
                                 font-weight: bold;
                             }
 
@@ -201,7 +205,8 @@ $red: #ff4444;
                                 color: $red;
                             }
 
-                            button.normal, button.useless {
+                            button.normal,
+                            button.useless {
                                 color: #fff;
                                 border: none;
                                 padding: 5px 10px;
