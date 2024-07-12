@@ -165,21 +165,33 @@ $red: #ff4444;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 
                 thead {
+                    line-height: 3;
+                    text-align: center;
+                    font-weight: bold;
+                    border-collapse: separate;
+                    border-radius: 20px;
                     background-color: $darkGreen;
                     color: #fff;
-                    position: sticky;
-                    top: 0;
-                    z-index: 1;
-
+                    tr {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 1.5fr 1fr 1.2fr 0.5fr 1fr;
+                    }
                     th {
-                        padding: 15px;
-                        text-align: left;
+                        padding: 10px;
+                        text-align: center;
                         font-weight: bold;
                     }
                 }
 
                 tbody {
                     tr {
+                        border-collapse: separate;
+                        // border-radius: 20px;
+                        display: grid;
+                        grid-template-columns: 1fr 1fr 1.5fr 1fr 1.2fr 0.5fr 1fr;
+                        // align-items: center;
+                        border-bottom: 1px solid #ddd;
+                        text-align: center;
                         &:nth-child(even) {
                             background-color: #f8f8f8;
                         }
