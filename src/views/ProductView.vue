@@ -443,7 +443,7 @@ $red: #ff4444;
                     z-index: 1;
 
                     th {
-                        padding: 15px;
+                        padding: 12px;
                         text-align: left;
                         font-weight: bold;
                     }
