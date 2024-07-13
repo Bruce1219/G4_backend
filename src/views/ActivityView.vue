@@ -3,7 +3,7 @@
         <div class="container">
             <div>
                 <h1>活動管理</h1>
-                <button @click="addActivity($event)">+ 新增活動</button >
+                <button @click="addActivity($event)">+ 新增活動</button>
             </div>
             <div class="wrap-table">
                 <table>
@@ -35,11 +35,11 @@
                             <td>{{ item.a_attendee }}人</td>
                             <td>NT$ {{ item.a_fee }}</td>
                             <td>{{ item.a_start_date }}</td>
-                            <td v-show = "item.a_status ==1">上架</td>
-                            <td v-show = "item.a_status == 0">下架</td>
+                            <td v-show="item.a_status == 1">上架</td>
+                            <td v-show="item.a_status == 0">下架</td>
                             <td>
                                 <button class="edit" @click="editEvent($event, index)">編輯</button>
-                                <button class="edit delete" @click="deleteEvent($event,index)">
+                                <button class="edit delete" @click="deleteEvent($event, index)">
                                     刪除
                                 </button>
                             </td>
@@ -49,17 +49,14 @@
             </div>
         </div>
     </section>
-    <div
-        class="section-addActivity"
-        v-show="addSwitch === true || editSwitch === true"
-       >
-        <div class="addActivity" @click.stop  ref="addLightBox">
+    <div class="section-addActivity" v-show="addSwitch === true || editSwitch === true">
+        <div class="addActivity" @click.stop ref="addLightBox">
             <h2 v-show="addSwitch">新增活動</h2>
             <h2 v-show="editSwitch">修改活動</h2>
             <form action="#">
                 <div>
                     <span>活動編號 : </span>
-                    <input type="number" name="a_no" v-model="a_no" disabled/>
+                    <input type="number" name="a_no" v-model="a_no" disabled />
                 </div>
                 <div>
                     <span>活動類別 : </span>
@@ -68,18 +65,24 @@
                         <option value="講座">講座</option>
                     </select>
                 </div>
-                <div >
-                    <label  >
-                    <span>新增圖片 : </span> 
-                    <input type="file" name="a_img" id="addImg" placeholder="上傳圖片" 
-                    ref="fileInput"
-                    @change="getfile($event)"/>
-                    <span class="fakeBrowBTN">選擇檔案</span> <span>{{ file ? file.name : '沒有選擇任何檔案' }}</span>
-                </label>
+                <div>
+                    <label>
+                        <span>新增圖片 : </span>
+                        <input
+                            type="file"
+                            name="a_img"
+                            id="addImg"
+                            placeholder="上傳圖片"
+                            ref="fileInput"
+                            @change="getfile($event)"
+                        />
+                        <span class="fakeBrowBTN">選擇檔案</span>
+                        <span>{{ file ? file.name : '沒有選擇任何檔案' }}</span>
+                    </label>
                 </div>
                 <div>
                     <span>活動名稱 : </span>
-                    <input type="text" name="a_name"  v-model="a_name" />
+                    <input type="text" name="a_name" v-model="a_name" />
                 </div>
                 <div>
                     <span>活動地址 : </span>
@@ -87,13 +90,24 @@
                 </div>
                 <div>
                     <span>報名上限 : </span>
-                    <input type="text" name="a_max" v-model="a_max"  max="999" min="0" maxlength="3"
-                    @keyup='handleKeyUp($event)'>
+                    <input
+                        type="text"
+                        name="a_max"
+                        v-model="a_max"
+                        max="999"
+                        min="0"
+                        maxlength="3"
+                        @keyup="handleKeyUp($event)"
+                    />
                 </div>
                 <div>
                     <span>活動費用 : </span>
-                    <input type="number" name="a_fee" v-model="a_fee"
-                    @keyup='handleKeyUp($event)' />
+                    <input
+                        type="number"
+                        name="a_fee"
+                        v-model="a_fee"
+                        @keyup="handleKeyUp($event)"
+                    />
                 </div>
                 <div>
                     <span>活動日期: </span>
@@ -115,7 +129,7 @@
                 </div>
                 <div>
                     <span>活動資訊: </span>
-                    <textarea name="a_info" v-model="a_info"  rows="4" cols="95"></textarea>
+                    <textarea name="a_info" v-model="a_info" rows="4" cols="95"></textarea>
                 </div>
                 <div>
                     <span>活動資訊1: </span>
@@ -159,14 +173,14 @@
             </form>
         </div>
     </div>
-    <div class="section-addActivity" v-show="deleteSwitch === true" @click="deleteEvent($event)"  >
-        <div class="delete-alert addActivity"  @click.stop>
+    <div class="section-addActivity" v-show="deleteSwitch === true" @click="deleteEvent($event)">
+        <div class="delete-alert addActivity" @click.stop>
             <h2>確定要刪除!!</h2>
             <div class="button">
-            <button type="button" class="cancel" @click="deleteEvent($event)">取消</button>
-            <button class=" delete confirm" @click="deleteConfirm()">刪除</button>
+                <button type="button" class="cancel" @click="deleteEvent($event)">取消</button>
+                <button class="delete confirm" @click="deleteConfirm()">刪除</button>
+            </div>
         </div>
-    </div>
     </div>
 </template>
 
@@ -200,8 +214,8 @@ export default {
             a_rules2: '',
             a_rules3: '',
             a_status: '',
-            file:null,
-            oldFileName:'',
+            file: null,
+            oldFileName: ''
         }
     },
     methods: {
@@ -219,22 +233,22 @@ export default {
             }
         },
         clearFile() {
-            this.$refs.fileInput.value = '';
+            this.$refs.fileInput.value = ''
         },
         parsePic(file) {
-            return `${import.meta.env.VITE_FILE_URL}event-images/${file}`;
+            return `${import.meta.env.VITE_FILE_URL}event-images/${file}`
         },
         addActivity(event) {
             event.stopPropagation() // 阻止事件冒泡
             //新增情況
-            this.clearFile();
-            this.scrollToTop();
+            this.clearFile()
+            this.scrollToTop()
             if (this.addSwitch === false) {
-                this.addSwitch = true;
-                this.a_no = this.activities.length+1
+                this.addSwitch = true
+                this.a_no = this.activities.length + 1
             } else {
                 this.addSwitch = false
-                this.a_no = this.activities.length+1
+                this.a_no = this.activities.length + 1
                 this.c_no = ''
                 this.a_img = null
                 this.a_name = ''
@@ -259,10 +273,10 @@ export default {
             }
         },
         scrollToTop() {
-      this.$refs.addLightBox.scrollTop = 0;
-    },
+            this.$refs.addLightBox.scrollTop = 0
+        },
         confirm() {
-            this.updateImage() ;
+            this.updateImage()
             // const url = `http://localhost/php_G4/addEvents.php`
             const url = `${import.meta.env.VITE_API_URL}/addEvents.php`
             let body = {
@@ -286,12 +300,12 @@ export default {
                 a_rules1: this.a_rules1,
                 a_rules2: this.a_rules2,
                 a_rules3: this.a_rules3,
-                a_status: this.a_status,
+                a_status: this.a_status
             }
             fetch(url, {
                 method: 'POST',
-                body:JSON.stringify(body),
-                headers:{'content-type':'multipart/form-data"'}
+                body: JSON.stringify(body),
+                headers: { 'content-type': 'multipart/form-data"' }
             })
                 .then((res) => res.json())
                 .then((json) => {
@@ -321,43 +335,43 @@ export default {
                 .catch((error) => {
                     console.error('Error:', error)
                 })
-        },deleteImage () {
+        },
+        deleteImage() {
             let body = {
-                oldFileName : this.oldFileName
+                oldFileName: this.oldFileName
             }
             // const url = `http://localhost/php_G4/deleteEventImage.php`
             const url = `${import.meta.env.VITE_API_URL}/deleteEventImage.php`
-            fetch(url,{
-                method:'POST',
-                body:JSON.stringify(body),
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify(body)
             })
-            .then((res) =>res.json)
-            .then((json)=>{
-                this.activities = json;
-            })
-
+                .then((res) => res.json)
+                .then((json) => {
+                    this.activities = json
+                })
         },
         updateImage() {
-            let formData = new FormData();
-            formData.append('a_img',this.file)//建立新的formdata
+            let formData = new FormData()
+            formData.append('a_img', this.file) //建立新的formdata
             const url = `${import.meta.env.VITE_API_URL}/addEventImage.php`
             // const url = `../../api/addEventImage.php`
-            fetch(url,{
-                method:'POST',
-                body:formData,
+            fetch(url, {
+                method: 'POST',
+                body: formData
             })
-            .then((res)=>res.json)
-            .then((json)=>{
-                this.activities = json;
-            })
+                .then((res) => res.json)
+                .then((json) => {
+                    this.activities = json
+                })
         },
         getfile(event) {
             this.file = event.target.files[0]
             this.a_img = this.file.name
         },
-        editEvent(event,index) {
+        editEvent(event, index) {
             event.stopPropagation()
-            this.scrollToTop();
+            this.scrollToTop()
             console.log(this.file)
             if (this.editSwitch === false) {
                 this.editSwitch = true
@@ -388,7 +402,7 @@ export default {
             } else {
                 //關閉時，重置
                 this.editSwitch = false
-                this.a_no = this.activities.length+1
+                this.a_no = this.activities.length + 1
                 this.c_no = ''
                 this.a_img = null
                 this.a_name = ''
@@ -419,7 +433,6 @@ export default {
             const url = `${import.meta.env.VITE_API_URL}/activitiesList.php`
             fetch(url, {
                 method: 'POST'
-                
             })
                 .then((res) => res.json())
                 .then((json) => {
@@ -428,9 +441,9 @@ export default {
                 })
         },
         editConfirm() {
-            this.updateImage();
-            if(this.file != null) {
-            this.deleteImage();
+            this.updateImage()
+            if (this.file != null) {
+                this.deleteImage()
             }
             // const url = `http://localhost/php_G4/editEvents.php`
             // const url = `../../api/editEvents.php`
@@ -457,7 +470,7 @@ export default {
                 a_rules2: this.a_rules2,
                 a_rules3: this.a_rules3,
                 a_status: this.a_status,
-                oldFileName:this.oldFileName
+                oldFileName: this.oldFileName
             }
             fetch(url, {
                 method: 'POST',
@@ -466,7 +479,7 @@ export default {
                 .then((res) => res.json())
                 .then((json) => {
                     this.data = json
-                    
+
                     if (
                         this.data != null ||
                         this.a_no != null ||
@@ -493,13 +506,13 @@ export default {
                     console.error('Error:', error)
                 })
         },
-        deleteEvent(event,index) {
-            event.stopPropagation();
+        deleteEvent(event, index) {
+            event.stopPropagation()
             if (this.deleteSwitch === false) {
                 this.deleteSwitch = true
                 //編輯把值帶入input裡面
-                this.a_no = this.activities[index].a_no;
-                this.oldFileName = '../../images/assets/'+this.activities[index].a_img
+                this.a_no = this.activities[index].a_no
+                this.oldFileName = '../../images/assets/' + this.activities[index].a_img
             } else {
                 //關閉時，重置
                 this.deleteSwitch = false
@@ -507,13 +520,13 @@ export default {
                 this.oldFileName = ''
             }
         },
-        deleteConfirm () {
-            this.deleteImage();
+        deleteConfirm() {
+            this.deleteImage()
             // const url = `http://localhost/php_G4/deleteEvents.php`
             // const url = `../../api/deleteEvents.php`
             const url = `${import.meta.env.VITE_API_URL}/deleteEvents.php`
             let body = {
-                a_no: this.a_no,
+                a_no: this.a_no
             }
             fetch(url, {
                 method: 'POST',
@@ -522,10 +535,7 @@ export default {
                 .then((res) => res.json())
                 .then((json) => {
                     this.data = json
-                    if (
-                        this.data != null ||
-                        this.a_no != null 
-                    ) {
+                    if (this.data != null || this.a_no != null) {
                         alert('刪除成功!')
                         this.deleteSwitch = false
                         this.fetchData()
@@ -557,6 +567,7 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
+        max-width: none;
         height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
@@ -602,32 +613,33 @@ export default {
                 thead {
                     text-align: center;
                     font-weight: bold;
-                    background-color:$darkGreen;
+                    background-color: $darkGreen;
                 }
                 tr {
                     display: flex;
                     justify-content: center;
                     vertical-align: middle;
-                &:nth-child(even) {
-                    background-color:#f8f8f8;
-                }
+                    &:nth-child(even) {
+                        background-color: #f8f8f8;
+                    }
                 }
                 th {
                     width: 10%;
-                    color:#fff;
+                    color: #fff;
                     font-family: Arial, sans-serif;
-                    font-size:15px;
+                    font-size: 15px;
                     padding: 10px;
                     border: solid 1px $darkGreen;
-                    border-top-left-radius:20px ;
+                    border-top-left-radius: 20px;
                     border-top-right-radius: 20px;
                 }
                 td {
                     width: 10%;
                     font-size: 14px;
-                    text-align: center;                    border-bottom: solid 1px #ddd;
+                    text-align: center;
+                    border-bottom: solid 1px #ddd;
                     box-sizing: border-box;
-                    vertical-align: middle
+                    vertical-align: middle;
                 }
                 /*第一欄第一列：左上*/
                 tr:first-child th:first-child {
@@ -729,85 +741,84 @@ export default {
                 align-items: center;
                 margin: 20px 0;
                 position: relative;
-                span{
-                    color:#144433;
-
+                span {
+                    color: #144433;
                 }
                 input {
                     width: 90%;
                     height: 30px;
-                    border:1px solid #ddd;
-                    background-color:#fff;
+                    border: 1px solid #ddd;
+                    background-color: #fff;
                     padding: 20px;
-                    border-radius:5px;
+                    border-radius: 5px;
                     outline: none;
                     &:focus {
-                        outline:1px solid $lightGreen;
+                        outline: 1px solid $lightGreen;
                         &::placeholder {
                             color: transparent;
                         }
                     }
-            
-                }input[type="file"] {
-                    border:none;
+                }
+                input[type='file'] {
+                    border: none;
                     height: 35px;
                     padding: 0;
                     background-color: transparent;
-                    color:#144433;
-                    position:absolute;
+                    color: #144433;
+                    position: absolute;
                     opacity: 0;
                     &:focus {
-                        outline:none;
+                        outline: none;
+                    }
                 }
-            }
-            .fakeBrowBTN {
-                    background-color: $lightGreen ;
-                    color:#fff;
-                        border:none;
-                        padding:5px;
-                        border-radius:5px;
-                        margin-right:5px;
-                        margin-left:5px;
+                .fakeBrowBTN {
+                    background-color: $lightGreen;
+                    color: #fff;
+                    border: none;
+                    padding: 5px;
+                    border-radius: 5px;
+                    margin-right: 5px;
+                    margin-left: 5px;
                 }
                 select {
                     width: 90%;
                     height: 35px;
                     border: solid 1px #ddd;
-                    border-radius:5px;
+                    border-radius: 5px;
                     padding: 0 14px;
                     outline: none;
                     color: grey;
                     &:focus {
-                        outline:1px solid $lightGreen;
+                        outline: 1px solid $lightGreen;
                         &::placeholder {
                             color: transparent;
                         }
                     }
                 }
-                input[type="datetime-local"] {
+                input[type='datetime-local'] {
                     width: 50%;
                     &:focus {
-                        outline:1px solid $lightGreen;
+                        outline: 1px solid $lightGreen;
+                    }
                 }
-                }
-                input[type="date"] {
+                input[type='date'] {
                     width: 45%;
                     &:focus {
-                        outline:1px solid $lightGreen;
-                }
+                        outline: 1px solid $lightGreen;
+                    }
                 }
                 textarea {
                     border-radius: 5px;
                     text-decoration: none;
-                    border:1px solid #ddd;
+                    border: 1px solid #ddd;
                     resize: none;
-                    padding:10px;
+                    padding: 10px;
                     &:focus {
-                        outline:1px solid $lightGreen;
+                        outline: 1px solid $lightGreen;
+                    }
                 }
             }
-    }
-    .button {
+            .button {
                 width: 35%;
                 margin-top: 30px;
                 button {
@@ -849,61 +860,59 @@ export default {
                         border: solid 1px $red;
                     }
                 }
+            }
         }
-}
-}
-.delete-alert {
-    width: 30%;
-    height: 30%;
-    h2{
-        color:#cc3300;
     }
-    .button {
-                width: 100%;
-                text-align: center;
-                margin-top: 30px;
-                button {
-                    display: inline-block;
-                    text-decoration: none;
-                    border-radius: 5px;
-                    border: 1px solid #eee;
-                    background-color: #144433;
-                    color: #fff;
-                    font-size: 1rem;
-                    font-weight: bold;
-                    width: 30%;
-                    padding: 7px 20px;
-                    letter-spacing: 1px;
-                    transition: transform 0.5s ease-in;
-                    transition: 0.5s;
-                    text-align: center;
-                    &:active {
-                        transform: scale(0.9);
-                    }
-                    &:hover {
-                        background-color: #fff;
-                        color: #144433;
-                        border: solid 1px #144433;
-                    }
-                    &:focus {
-                        outline: none;
-                        &::placeholder {
-                            color: transparent;
-                        }
-                    }
-                }
-                .cancel {
-                    background-color: $red;
-                    color: #fff;
-                    &:hover {
-                        background-color: #fff;
-                        color: $red;
-                        border: solid 1px $red;
-                    }
-                }
+    .delete-alert {
+        width: 30%;
+        height: 30%;
+        h2 {
+            color: #cc3300;
         }
-
+        .button {
+            width: 100%;
+            text-align: center;
+            margin-top: 30px;
+            button {
+                display: inline-block;
+                text-decoration: none;
+                border-radius: 5px;
+                border: 1px solid #eee;
+                background-color: #144433;
+                color: #fff;
+                font-size: 1rem;
+                font-weight: bold;
+                width: 30%;
+                padding: 7px 20px;
+                letter-spacing: 1px;
+                transition: transform 0.5s ease-in;
+                transition: 0.5s;
+                text-align: center;
+                &:active {
+                    transform: scale(0.9);
+                }
+                &:hover {
+                    background-color: #fff;
+                    color: #144433;
+                    border: solid 1px #144433;
+                }
+                &:focus {
+                    outline: none;
+                    &::placeholder {
+                        color: transparent;
+                    }
+                }
+            }
+            .cancel {
+                background-color: $red;
+                color: #fff;
+                &:hover {
+                    background-color: #fff;
+                    color: $red;
+                    border: solid 1px $red;
+                }
+            }
+        }
+    }
 }
-}
-
 </style>

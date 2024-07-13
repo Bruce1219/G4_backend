@@ -4,42 +4,47 @@
             <div>
                 <h1>商品訂單管理</h1>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">訂單編號</th>
-                        <th scope="col">會員編號</th>
-                        <th scope="col">訂購人</th>
-                        <th scope="col">訂單日期</th>
-                        <th scope="col">出貨日期</th>
-                        <th scope="col">金額</th>
-                        <th scope="col">訂單狀態</th>
-                        <th scope="col">操作</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="order in p_orders" :key="order.po_no">
-                        <td>{{ order.po_no }}</td>
-                        <td>{{ order.m_no }}</td>
-                        <td>{{ order.po_name }}</td>
-                        <td>{{ order.po_time }}</td>
-                        <td>{{ order.po_deliverdate }}</td>
-                        <td>NT$ {{ order.po_total }}</td>
-                        <td>
-                            <select v-model="order.po_status" @change="updateOrderStatus(order)">
-                                <option value="0">待配送</option>
-                                <option value="1">配送中</option>
-                                <option value="2">配送完成</option>
-                                <option value="3">待審核</option>
-                                <option value="4">已註銷</option>
-                            </select>
-                        </td>
-                        <td>
-                            <button class="edit" @click="viewOrder(order.po_no)">查看</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="wrap-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">訂單編號</th>
+                            <th scope="col">會員編號</th>
+                            <th scope="col">訂購人</th>
+                            <th scope="col">訂單日期</th>
+                            <th scope="col">出貨日期</th>
+                            <th scope="col">金額</th>
+                            <th scope="col">訂單狀態</th>
+                            <th scope="col">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="order in p_orders" :key="order.po_no">
+                            <td>{{ order.po_no }}</td>
+                            <td>{{ order.m_no }}</td>
+                            <td>{{ order.po_name }}</td>
+                            <td>{{ order.po_time }}</td>
+                            <td>{{ order.po_deliverdate }}</td>
+                            <td>NT$ {{ order.po_total }}</td>
+                            <td>
+                                <select
+                                    v-model="order.po_status"
+                                    @change="updateOrderStatus(order)"
+                                >
+                                    <option value="0">待配送</option>
+                                    <option value="1">配送中</option>
+                                    <option value="2">配送完成</option>
+                                    <option value="3">待審核</option>
+                                    <option value="4">已註銷</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button class="edit" @click="viewOrder(order.po_no)">查看</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Lightbox -->
@@ -134,7 +139,7 @@ export default {
 
         viewOrder(po_no) {
             console.log('Viewing order:', po_no)
-             // url='http://localhost/php_g4/back_productOrders.php'
+            // url='http://localhost/php_g4/back_productOrders.php'
             fetch(`${import.meta.env.VITE_API_URL}/back_productOrders.php`, {
                 method: 'POST',
                 headers: {
@@ -262,9 +267,10 @@ export default {
 
     .container {
         width: 80%;
+        max-width: none;
+        height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;
-
         div {
             display: flex;
             justify-content: space-between;
@@ -293,74 +299,86 @@ export default {
                 }
             }
         }
-
-        table {
+        .wrap-table {
+            //有scrollbar
             width: 100%;
+            height: 75%;
+            overflow: auto;
             margin-top: 30px;
-            background-color: #fff;
-            border-collapse: separate;
-            border-spacing: 0;
-
-            thead {
-                line-height: 3;
-                text-align: center;
-                font-weight: bold;
+            table {
+                width: 100%;
+                // margin-top: 30px;
+                background-color: #fff;
                 border-collapse: separate;
-                border-radius: 20px;
-            }
+                border-spacing: 0;
 
-            tr {
-                border-collapse: separate;
-                border-radius: 20px;
-            }
+                thead {
+                    line-height: 3;
+                    text-align: center;
+                    font-weight: bold;
+                    border-collapse: separate;
+                    border-radius: 20px;
+                    background-color: $darkGreen;
+                    color: #fff;
+                }
 
-            th {
-                color: #144433;
-                font-size: 16px;
-                padding: 10px;
-                border: solid 1px $darkGreen;
-            }
+                tr {
+                    border-collapse: separate;
+                    border-radius: 20px;
+                    &:nth-child(even) {
+                        background-color: #f8f8f8;
+                    }
+                }
 
-            td {
-                font-size: 16px;
-                margin: 0 3px;
-                line-height: 3;
-                text-align: center;
-                border: solid 1px $darkGreen;
-            }
+                th {
+                    color: #fff;
+                    font-size: 16px;
+                    padding: 10px;
+                    border: solid 1px $darkGreen;
+                }
 
-            tr:first-child th:first-child {
-                border-top-left-radius: 20px;
-            }
+                td {
+                    font-size: 16px;
+                    margin: 0 3px;
+                    line-height: 3;
+                    text-align: center;
+                    // border: solid 1px $darkGreen;
+                    border-top: solid 1px #ddd;
+                }
 
-            tr:last-child td:first-child {
-                border-bottom-left-radius: 20px;
-            }
+                tr:first-child th:first-child {
+                    border-top-left-radius: 20px;
+                }
 
-            tr:first-child th:last-child {
-                border-top-right-radius: 20px;
-            }
+                tr:last-child td:first-child {
+                    border-bottom-left-radius: 20px;
+                }
 
-            tr:last-child td:last-child {
-                border-bottom-right-radius: 20px;
-            }
+                tr:first-child th:last-child {
+                    border-top-right-radius: 20px;
+                }
 
-            td:last-child {
-                line-height: 1;
-            }
+                tr:last-child td:last-child {
+                    border-bottom-right-radius: 20px;
+                }
 
-            .edit {
-                color: #fff;
-                text-decoration: none;
-                background-color: $darkGreen;
-                border: none;
-                padding: 7px 20px;
-                margin: 5px 0;
-                border-radius: 20px;
-                transition: 0.5s;
+                td:last-child {
+                    line-height: 1;
+                }
 
-                &:hover {
-                    background-color: $red;
+                .edit {
+                    color: #fff;
+                    text-decoration: none;
+                    background-color: $darkGreen;
+                    border: none;
+                    padding: 7px 20px;
+                    margin: 5px 0;
+                    border-radius: 20px;
+                    transition: 0.5s;
+
+                    &:hover {
+                        background-color: $red;
+                    }
                 }
             }
         }

@@ -141,7 +141,9 @@ export default {
         async fetchRegions() {
             try {
                 //const response = await fetch('http://localhost/php_g4/farm.php?action=getRegions')
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/farm.php?action=getRegions`)
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/farm.php?action=getRegions`
+                )
                 if (!response.ok) {
                     throw new Error(`HTTP錯誤！狀態：${response.status}`)
                 }
@@ -189,9 +191,9 @@ export default {
 
                 const method = this.showAddFarmModal ? 'POST' : 'PUT'
                 const url = this.showAddFarmModal
-                    //? 'http://localhost/php_g4/farm.php'
-                    //: `http://localhost/php_g4/farm.php?id=${this.currentFarm.f_no}`
-                    ? `${import.meta.env.VITE_API_URL}/farm.php`
+                    ? //? 'http://localhost/php_g4/farm.php'
+                      //: `http://localhost/php_g4/farm.php?id=${this.currentFarm.f_no}`
+                      `${import.meta.env.VITE_API_URL}/farm.php`
                     : `${import.meta.env.VITE_API_URL}/farm.php?id=${this.currentFarm.f_no}`
 
                 const response = await fetch(url, {
@@ -232,9 +234,12 @@ export default {
 
             try {
                 //const response = await fetch(`http://localhost/php_g4/farm.php?id=${farmNo}`, {
-                const response = await fetch(`${import.meta.env.VITE_API_URL}/farm.php?id=${farmNo}`, {
-                    method: 'DELETE'
-                })
+                const response = await fetch(
+                    `${import.meta.env.VITE_API_URL}/farm.php?id=${farmNo}`,
+                    {
+                        method: 'DELETE'
+                    }
+                )
                 if (!response.ok) {
                     const errorData = await response.json()
                     throw new Error(errorData.msg || `HTTP錯誤！狀態：${response.status}`)
@@ -282,7 +287,7 @@ export default {
             formData.append('f_img', file)
 
             try {
-               // const url = 'http://localhost/php_G4/farmImg.php'
+                // const url = 'http://localhost/php_G4/farmImg.php'
                 const url = `${import.meta.env.VITE_API_URL}/farmImg.php`
                 const response = await fetch(url, {
                     method: 'POST',
@@ -341,6 +346,7 @@ $red: #ff4444;
 
     .container {
         width: 80%;
+        max-width: none;
         padding: 30px;
         display: flex;
         flex-direction: column;

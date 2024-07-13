@@ -269,6 +269,7 @@ export default {
     justify-content: flex-start;
     .container {
         width: 80%;
+        max-width: none;
         height: 85vh; //寫死高度
         padding: 30px;
         margin: 0;

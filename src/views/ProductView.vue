@@ -383,10 +383,11 @@ $red: #ff4444;
 
     .container {
         width: 80%;
+        max-width: none;
         padding: 30px;
         display: flex;
         flex-direction: column;
-        height: calc(100vh - 60px);
+        height: 85vh;
         margin-left: 20%;
 
         > div:first-child {
@@ -518,7 +519,9 @@ $red: #ff4444;
         max-height: 80vh;
         overflow-y: auto;
         position: relative;
-
+        &::-webkit-scrollbar {
+            width: 1px;
+        }
         .close {
             color: #aaa;
             float: right;
