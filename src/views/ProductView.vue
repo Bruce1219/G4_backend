@@ -475,7 +475,7 @@ $red: #ff4444;
 
                             .edit {
                                 background-color: $darkGreen;
-
+                                border-radius:20px ;
                                 &:hover {
                                     background-color: darken($darkGreen, 10%);
                                 }
@@ -483,7 +483,7 @@ $red: #ff4444;
 
                             .delete {
                                 background-color: $red;
-
+                                border-radius:20px ;
                                 &:hover {
                                     background-color: darken($red, 10%);
                                 }

@@ -182,7 +182,7 @@ $red: #ff4444;
                         }
 
                         td {
-                            padding: 15px;
+                            padding: 13px;
                             border-bottom: 1px solid #ddd;
 
                             &:last-child {
