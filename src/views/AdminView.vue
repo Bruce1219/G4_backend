@@ -198,7 +198,8 @@ export default {
                 alert('請填完所有欄位')
                 return false
             }
-            const url = `http://localhost/php_g4/addAdmin.php`
+            // const url = `http://localhost/php_g4/addAdmin.php` //本地
+            const url = `${import.meta.env.VITE_API_URL}/addAdmin.php` //部屬
             let body = {
                 am_account: this.am_account,
                 am_password: this.am_password,
