@@ -1,35 +1,38 @@
-# G4-backend
+# G4_fruit_Admin 
 
-This template should help get you started developing with Vue 3 in Vite.
+What's for?
+---
+G4_fruit_Admin is a content management system for G4_fruit_Frontend.<br>
+Used for uploading news, products, promotions, and managing orders and bookings. <br><br>
+G4_fruit_Admin has started developing with Vue 3 in Vite, incorporating ajax, bootstrap, and pinia. Use Ajax to make REST API requests.
 
-## Recommended IDE Setup
+Where's the website?
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+Here are the online link:<br>
+- [**G4_fruit_Admin**](https://tibamef2e.com/cid101/g4/admin/)  <br>
+user: griddy789, password: griddy123<br> 
+- [**G4_fruit**](https://tibamef2e.com/cid101/g4/front/)  <br>
+A board game store website, which is GridIsland_Admin's forestage. <br>
+- [**G4_fruit_api_GitHub**](https://github.com/elaine0623/G4_php.git)  <br>
+write with PHP <br>
+- [**G4_fruit_SA_Document(zh)**](https://drive.google.com/drive/u/0/folders/1a9A2WpQvxhV6Ca7qUgNphJzw1UL-O4KG?sort=13&direction=a)<br>
+System analysis document of G4_fruit. <br>
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+## Setup
 
 ```sh
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Development Server
 
 ```sh
 npm run dev
 ```
 
-### Compile and Minify for Production
+### Production
 
 ```sh
 npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
 ```
