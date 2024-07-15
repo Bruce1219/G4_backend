@@ -11,12 +11,12 @@ Where's the website?
 
 Here are the online link:<br>
 - [**G4_fruit_Admin**](https://tibamef2e.com/cid101/g4/admin/)  <br>
-user: griddy789, password: griddy123<br> 
+user: admin001, password: 001<br> 
 - [**G4_fruit**](https://tibamef2e.com/cid101/g4/front/)  <br>
-A board game store website, which is GridIsland_Admin's forestage. <br>
+A website that promotes and sells agricultural products, which is G4_fruit_Admin's forestage. <br>
 - [**G4_fruit_api_GitHub**](https://github.com/elaine0623/G4_php.git)  <br>
 write with PHP <br>
-- [**G4_fruit_SA_Document(zh)**](https://drive.google.com/drive/u/0/folders/1a9A2WpQvxhV6Ca7qUgNphJzw1UL-O4KG?sort=13&direction=a)<br>
+- [**G4_fruit_SA_Document(zh)**](https://drive.google.com/file/d/1C1k3sDOqOyIEzS0rpjOansVMceRwSDg-/view?usp=sharing)<br>
 System analysis document of G4_fruit. <br>
 
 ## Setup
