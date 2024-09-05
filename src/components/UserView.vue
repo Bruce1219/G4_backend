@@ -41,9 +41,9 @@ import { useAdminStore } from '@/store/adminState.js' // 引入 Pinia store
 export default {
     data() {
         return {
-            acc: '',
-            psw: '',
-            errorMsg: {
+            acc: '', //帳號
+            psw: '', //密碼
+            errorMsg: { //錯誤訊息
                 acc: '',
                 psw: ''
             }
@@ -62,7 +62,7 @@ export default {
         },
         async memLogin() {
             try {
-                const store = useAdminStore() // 獲取 Pinia store 的實例
+                const store = useAdminStore() // 獲取 Pinia store 的實例，用來保存用戶數據
 
                 // const url = `http://localhost/php_g4/admin.php`//本地
                 const url = `${import.meta.env.VITE_API_URL}/admin.php` //部屬
@@ -70,18 +70,21 @@ export default {
                     acc: this.acc,
                     psw: this.psw
                 }
+                // 發送 POST 請求到後端伺服器，並傳遞帳號與密碼
                 const response = await fetch(url, {
-                    method: 'POST',
-                    body: JSON.stringify(body)
+                    method: 'POST', // 使用 POST 方法
+                    body: JSON.stringify(body) // 將帳號與密碼轉換為 JSON 格式發送
                 })
+                // 將後端返回的響應轉換為 JSON
                 const users = await response.json()
                 console.log(users['data'])
+                
                 if (users.code != 200) {
                     alert(users.msg)
                     this.acc = ''
                     this.psw = ''
                 } else {
-                    store.setCurrentUser(users['data']) // 設置當前用戶到 Pinia
+                    store.setCurrentUser(users['data']) // 將管理員數據保存到 Pinia store
                     alert('登入成功!')
                     this.$router.push('/indexsidebar/admin')
                 }
