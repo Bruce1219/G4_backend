@@ -1,4 +1,4 @@
-<template>
+<template>  
     <section>
         <div class="maintitle">
             <h1>果籽後台</h1>
@@ -59,15 +59,14 @@
 </template>
 
 <script>
-import { useAdminStore } from '@/store/adminState.js'
+import { useAdminStore } from '@/store/adminState.js' // 引入 Pinia store，用於管理全局狀態
 
 export default {
     data() {
         return {
-            currentAccount: null,
-            am_no: '001',
-            activeIndex: null,
-            activeLinkIndex: null,
+            currentAccount: null, //登入帳號
+            activeIndex: null, // 展開的管理項目
+            activeLinkIndex: null, // 被選中的連接
             navItems: [
                 {
                     title: '首頁管理',
@@ -76,7 +75,6 @@ export default {
                     links: [
                         { route: '/indexsidebar/farm', text: '農場' },
                         { route: '/indexsidebar/news', text: '最新消息' }
-                        // { route: '/indexsidebar/chatbox', text: '客服機器人' }
                     ]
                 },
                 {
@@ -85,8 +83,6 @@ export default {
                     collapseId: 'member-collapse',
                     links: [
                         { route: '/indexsidebar/member', text: '會員' }
-                        // { route: '/coupons', text: '會員擁有優惠卷' },
-                        // { route: '/favorites', text: '會員收藏商品' }
                     ]
                 },
                 {
@@ -95,9 +91,7 @@ export default {
                     collapseId: 'product-collapse',
                     links: [
                         { route: '/indexsidebar/product', text: '商品' },
-                        // { route: '/categories', text: '商品分類' },
                         { route: '/indexsidebar/porders', text: '商品訂單' }
-                        // { route: '/details', text: '商品明細' }
                     ]
                 },
                 {
@@ -106,7 +100,6 @@ export default {
                     collapseId: 'activity-collapse',
                     links: [
                         { route: '/indexsidebar/activity', text: '活動' },
-                        // { route: '/activity-categories', text: '活動分類' },
                         { route: '/indexsidebar/aorders', text: '活動訂單' }
                     ]
                 },
@@ -122,41 +115,40 @@ export default {
                     collapseId: 'back-collapse',
                     links: [
                         { route: '/indexsidebar/admin', text: '管理員' }
-                        // { route: '/indexsidebar/coupon', text: '優惠卷' }
                     ]
                 }
             ]
         }
     },
     setup() {
-        const store = useAdminStore()
+        const store = useAdminStore() // 獲取 Pinia store 的實例
         return {
-            store
+            store // 返回 store 以便於在模板中使用
         }
     },
     methods: {
         toggle(index) {
-            // 切换 activeIndex，确保可以展开和收起
+            // 切換 activeIndex，確保可以展開和收起選中的管理項目
             if (this.activeIndex === index) {
-                this.activeIndex = null
+                this.activeIndex = null 
             } else {
-                this.activeIndex = index
+                this.activeIndex = index 
             }
         },
         setActive(parentIndex, linkIndex) {
-            // 设置或取消子链接的活动状态
+            // 設定或取消連結的活動狀態
             if (this.activeIndex === parentIndex && this.activeLinkIndex === linkIndex) {
-                // this.activeLinkIndex = null // 如果点击当前活跃链接，则取消 active 状态
+                // this.activeLinkIndex = null 
             } else {
                 this.activeIndex = parentIndex
-                this.activeLinkIndex = linkIndex // 设置被点击链接的索引为 active
+                this.activeLinkIndex = linkIndex 
             }
         },
         async memsignout() {
             try {
                 const store = useAdminStore() // 獲取 Pinia store
 
-                store.clearCurrentUser() // 設置當前用戶到 Pinia
+                store.clearCurrentUser() // 清除當前管理員
                 alert('已登出')
                 this.$router.push('/')
             } catch (error) {
@@ -168,7 +160,7 @@ export default {
             const user = localStorage.getItem('currentAdmin')
             if (user) {
                 const parsedUser = JSON.parse(user)
-                this.currentAccount = parsedUser.am_account // 使用正確的鍵名
+                this.currentAccount = parsedUser.am_account // 將解析後的帳號存儲到 currentAccount
             }
         }
     },

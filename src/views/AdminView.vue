@@ -51,26 +51,6 @@
             <span class="close" @click="addAdmin($event)">&times;</span>
             <h2>新增管理員</h2>
             <form action="#">
-                <!-- <div>
-                    <span>管理員代號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員編號"
-                        v-model="am_no"
-                    />
-                </div> -->
-                <!-- <div>
-                    <span>管理員帳號 : </span>
-                    <input
-                        type="text"
-                        name=""
-                        id=""
-                        placeholder="請輸入管理員帳號"
-                        v-model="am_account"
-                    />
-                </div> -->
                 <div>
                     <span>管理員密碼 : </span>
                     <input
@@ -111,24 +91,23 @@ import { useAdminStore } from '@/store/adminState.js' // 引入 Pinia store
 export default {
     data() {
         return {
-            currentAccount: null,
-            admin: [],
-            addSwitch: false,
-            am_password: '',
-            am_level: '',
-            am_status: ''
+            currentAccount: null, //目前管理員帳號
+            admin: [], //管理員列表
+            addSwitch: false, //新增管理員開關
+            am_password: '', //管理員密碼
+            am_level: '', //管理員等級
+            am_status: '' //管理員狀態
         }
     },
     setup() {
+        //使用pinia store
         const store = useAdminStore()
         return {
             store
         }
     },
-    mounted() {
-        this.fetchData()
-    },
     methods: {
+        //管理員停權復權
         toggleStatus(user) {
             if (this.currentUser && this.currentUser.am_level === '1') {
                 const newStatus = user.am_status == 1 ? 0 : 1
@@ -159,6 +138,7 @@ export default {
                     })
             }
         },
+        //新增管理員燈箱
         addAdmin(event) {
             event.stopPropagation() // 阻止事件冒泡
             if (this.addSwitch === false) {
@@ -169,6 +149,7 @@ export default {
                 ;(this.am_password = ''), (this.am_level = ''), (this.am_status = '')
             }
         },
+        //目前管理員資料
         loadCurrentAccount() {
             const user = localStorage.getItem('currentAdmin')
             if (user) {
@@ -176,6 +157,7 @@ export default {
             }
             console.log(this.currentUser)
         },
+        //取得管理員列表資料
         fetchData() {
             // const url = `http://localhost/php_g4/adminList.php`//本地
             const url = `${import.meta.env.VITE_API_URL}/adminList.php` //部屬
@@ -193,6 +175,7 @@ export default {
                     console.log(this.admin)
                 })
         },
+        //新增管理員
         confirm() {
             if (this.am_password === '' || this.am_level === '' || this.am_status === '') {
                 alert('請填完所有欄位')
@@ -232,6 +215,9 @@ export default {
     },
     created() {
         this.loadCurrentAccount()
+    },
+    mounted() {
+        this.fetchData()
     }
 }
 </script>

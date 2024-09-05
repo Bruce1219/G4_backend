@@ -134,27 +134,23 @@
 </template>
 
 <script>
-// import { toHandlers } from 'vue'
 
 export default {
     data() {
         return {
-            selectedNum: 0,
-            a_orders: [],
-            display: [],
-            currentClass: '3',
-            addSwitch: false,
-            ao_no: '',
-            ao_status: '',
-            a_no: '',
-            ao_count: ''
+            a_orders: [], // 儲存所有活動訂單
+            display: [], // 顯示過濾後的訂單數據
+            currentClass: '3', // 表示當前篩選的狀態，'3' 表示顯示所有訂單
+            addSwitch: false, // 控制是否顯示訂單詳細信息的開關
+            ao_no: '', // 當前活動訂單的編號
+            ao_status: '', // 當前活動訂單的狀態
+            a_no: '', // 活動的編號
+            ao_count: '' // 報名人數
         }
     },
     computed: {
         filterDataDisplay() {
-            // let filteredData = this.a_orders;
-            // this.display = this.filteredData;
-            // console.log(filteredData)
+            // 根據 currentClass 的值來篩選訂單
             if (this.currentClass === '3') {
                 return this.a_orders
             } else {
@@ -165,6 +161,7 @@ export default {
         }
     },
     methods: {
+        //獲取活動訂單數據
         fetchData() {
             // const url = `http://localhost/php_g4/activity_orderlist.php`//本地
             const url = `${import.meta.env.VITE_API_URL}/activity_orderlist.php` //部屬
@@ -173,9 +170,10 @@ export default {
             })
                 .then((res) => res.json())
                 .then((json) => {
-                    this.a_orders = json['data']['list']
+                    this.a_orders = json['data']['list'] // 將回應的活動訂單存入 a_orders
                     console.log(json)
                     console.log(this.a_orders)
+                    // 根據 currentClass 判斷顯示的活動訂單
                     if (this.currentClass === '3') {
                         this.display = this.a_orders
                         console.log(this.display)
@@ -186,6 +184,7 @@ export default {
                     }
                 })
         },
+        // 控制顯示某個訂單的詳細資訊
         checkAorder(event, index) {
             event.stopPropagation() // 阻止事件冒泡
             if (this.addSwitch === false) {
@@ -197,18 +196,21 @@ export default {
                 this.display = []
             }
         },
+        // 返回日期部分
         formatDate(dateTime) {
             if (!dateTime) {
                 return ''
             }
-            return dateTime.split(' ')[0]
+            return dateTime.split(' ')[0] 
         },
+        // 返回時間部分
         formatTime(dateTime) {
             if (!dateTime) {
                 return ''
             }
-            return dateTime.split(' ')[1]
+            return dateTime.split(' ')[1] 
         },
+        // 切換訂單狀態
         toggleStatus() {
             const newStatus = this.ao_status === 0
 
@@ -239,6 +241,7 @@ export default {
                     console.error('Error:', error)
                 })
         },
+        // 篩選器
         activedClass() {
             let activeClass = document.querySelector('#filter') // //偵測目前商品類別為何
             this.currentClass = activeClass.value
